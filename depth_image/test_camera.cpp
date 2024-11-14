@@ -28,7 +28,6 @@ int main() {
                 depth_image.at<uint16_t>(y, x) = depth_value;
             }
         }
-
         // Save the depth image as a PNG file
         cv::imwrite("depth_image.png", depth_image);
         std::cout << "Depth image saved as depth_image.png" << std::endl;
