@@ -1,5 +1,6 @@
 #include <librealsense2/rs.hpp>
 #include <librealsense2/rs.h>
+#include <librealsense2/rsutil.h>
 #include <librealsense2/h/rs_pipeline.h>
 #include <librealsense2/h/rs_option.h>
 #include <librealsense2/h/rs_frame.h>
@@ -7,6 +8,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <fstream>
+#include <vector>
+#include <array>
+
+
+
 
 #define MIN_DIST 0.01f  // Set the max distance (in meters) for the color gradient
 #define MAX_DIST 5.0f  // Set the max distance (in meters) for the color gradient
@@ -51,12 +58,15 @@ int main(int argc, char *argv[]) {
     // Obtain the intrinsics
     rs2_stream_profile_list* stream_profiles = rs2_pipeline_profile_get_streams(pipeline_profile, &e);
     const rs2_stream_profile* depth_stream_profile = rs2_get_stream_profile(stream_profiles, 0, &e);
-    rs2_video_stream_profile* video_stream_profile = (rs2_video_stream_profile*)depth_stream_profile;
     rs2_intrinsics intrinsics;
-    rs2_get_video_stream_intrinsics(video_stream_profile, &intrinsics, &e);
+    // Convert stream profile to video stream profile (depth stream is considered as a video stream)
+    //const rs2_video_stream_profile* video_stream_profile = reinterpret_cast<const rs2_video_stream_profile*>(depth_stream_profile);
+    rs2_get_video_stream_intrinsics(depth_stream_profile, &intrinsics, &e);
 
-// Clean up stream profiles
-rs2_delete_stream_profiles_list(stream_profiles);
+
+
+    // Clean up stream profiles
+    rs2_delete_stream_profiles_list(stream_profiles);
 
     for (int frame_count = 0; frame_count < n_index; ++frame_count) {
         rs2_frame* frames = rs2_pipeline_wait_for_frames(pipeline, RS2_DEFAULT_TIMEOUT, &e);
@@ -72,7 +82,7 @@ rs2_delete_stream_profiles_list(stream_profiles);
             uint16_t depth = frame_data[i];
             if (depth >= 0 && depth <= max_depth) {
                 depth_data[i] = depth;
-                valid_pixel_count.at<float>(i / WIDTH, i % WIDTH) += 1.0f;
+                valid_pixel_count.at<int>(i / WIDTH, i % WIDTH) += 1;
             } else {
                 depth_data[i] = 0;  // Set out-of-range depth to 0
             }
@@ -88,7 +98,14 @@ rs2_delete_stream_profiles_list(stream_profiles);
     }
 
     // Compute the mean depth image
-    cv::divide(accumulated_depth, valid_pixel_count, accumulated_depth);
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            if (valid_pixel_count.at<int>(y, x) > 0) {
+                accumulated_depth.at<float>(y, x) /= valid_pixel_count.at<int>(y, x);
+            }
+        }
+    }
+    //cv::divide(accumulated_depth, valid_pixel_count, accumulated_depth);
     //accumulated_depth /= n_index;
 
     // Normalize and convert to 8-bit for visualization
@@ -106,32 +123,45 @@ rs2_delete_stream_profiles_list(stream_profiles);
     cv::imwrite(filename, depth_color);
 
 
-    // // Open a CSV file to write the depth data
-    // char filename2[50];
-    // sprintf(filename2, "mean%d_depth_csv.csv", n_index);
-    // std::ofstream csv_file(mean3_depth_csv.csv);
-    // if (!csv_file.is_open()) {
-    //     printf("Failed to open the CSV file.\n");
-    //     return EXIT_FAILURE;
-    // }
-    // // Write the header
-    // csv_file << "x,y,depth_mm\n";
-
-    // // Write the depth data to the CSV file
-    // for (int y = 0; y < HEIGHT; ++y) {
-    //     for (int x = 0; x < WIDTH; ++x) {
-    //         float depth_mm = accumulated_depth.at<float>(y, x);
-    //         if (depth_mm > 0) {
-    //             csv_file << x << "," << y << "," << depth_mm << "\n";
-    //         }
-    //         csv_file << "\n";
-    //     }
-    // }
-    // // Close the CSV file
-    // csv_file.close();
+    // Open a CSV file to write the depth data
+    char filename2[50];
+    sprintf(filename2, "mean%d_depth_csv.csv", n_index);
+    std::ofstream csv_file(filename2);
+    if (!csv_file.is_open()) {
+        printf("Failed to open the CSV file.\n");
+        return EXIT_FAILURE;
+    }
+    // Write the depth data to the CSV file
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            float depth_mm = accumulated_depth.at<float>(y, x);
+            csv_file << depth_mm << ",";
+        }
+        csv_file << "\n";
+    }
+    // Close the CSV file
+    csv_file.close();
 
 
+    // Deproject pixels to 3D points
+    std::vector<std::array<float, 3>> points;
 
+    for (int i = 0; i < HEIGHT; ++i) {
+        for (int j = 0; j < WIDTH; ++j) {
+            float pixel[2] = { static_cast<float>(j), static_cast<float>(i) };
+            float depth = accumulated_depth.at<float>(i, j);
+            float point[3];
+            rs2_deproject_pixel_to_point(point, &intrinsics, pixel, depth);
+            points.push_back({ point[0], point[1], point[2] });
+        }
+    }
+
+    // Optionally, save the 3D points to a file
+    std::ofstream points_file("points.txt");
+    for (const auto& point : points) {
+        points_file << point[0] << "," << point[1] << "," << point[2] << "\n";
+    }
+    points_file.close();
 
 
     // Stop the pipeline
@@ -144,6 +174,5 @@ rs2_delete_stream_profiles_list(stream_profiles);
     rs2_delete_device(dev);
     rs2_delete_device_list(device_list);
     rs2_delete_context(ctx);
-
     return EXIT_SUCCESS;
 }
