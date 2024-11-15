@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define MAX_DIST 5.0f  // Set the max distance (in meters) for the color gradient
+#define MAX_DIST 15.0f  // Set the max distance (in meters) for the color gradient
 #define WIDTH 640
 #define HEIGHT 480
 #define FPS 30
@@ -20,7 +20,6 @@ void check_error(rs2_error* e) {
         exit(EXIT_FAILURE);
     }
 }
-
 
 // Function to determine the maximum depth value in the frame
 float get_max_depth_value(const uint16_t* frame_data, int width, int height) {
