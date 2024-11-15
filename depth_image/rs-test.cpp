@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
 
     // Open a CSV file to write the depth data
     char filename2[50];
-    sprintf(filename2, "mean%d_depth_csv.csv", n_index);
+    sprintf(filename2, "mean%d_depth.csv", n_index);
     std::ofstream csv_file(filename2);
     if (!csv_file.is_open()) {
         printf("Failed to open the CSV file.\n");
