@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/matrix.dir/matrix.cpp.o -o matrix  -Wl,-rpath,/usr/local/lib /usr/local/lib/librealsense2.so.2.55.1 /usr/local/lib/librsutils.a 

@@ -1,0 +1,4 @@
+/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/rs-test.dir
+/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/matrix.dir
+/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/edit_cache.dir
+/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/rebuild_cache.dir
