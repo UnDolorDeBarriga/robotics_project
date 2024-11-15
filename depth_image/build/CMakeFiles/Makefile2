@@ -64,7 +64,6 @@ CMAKE_BINARY_DIR = /home/arnau/Desktop/robotics_project/depth_image/build
 
 # The main recursive "all" target.
 all: CMakeFiles/rs-test.dir/all
-all: CMakeFiles/matrix.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -73,7 +72,6 @@ preinstall:
 
 # The main recursive "clean" target.
 clean: CMakeFiles/rs-test.dir/clean
-clean: CMakeFiles/matrix.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -83,7 +81,7 @@ clean: CMakeFiles/matrix.dir/clean
 CMakeFiles/rs-test.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles --progress-num=3,4 "Built target rs-test"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles --progress-num=1,2 "Built target rs-test"
 .PHONY : CMakeFiles/rs-test.dir/all
 
 # Build rule for subdir invocation for target.
@@ -101,32 +99,6 @@ rs-test: CMakeFiles/rs-test.dir/rule
 CMakeFiles/rs-test.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/clean
 .PHONY : CMakeFiles/rs-test.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/matrix.dir
-
-# All Build rule for target.
-CMakeFiles/matrix.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles --progress-num=1,2 "Built target matrix"
-.PHONY : CMakeFiles/matrix.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/matrix.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/matrix.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles 0
-.PHONY : CMakeFiles/matrix.dir/rule
-
-# Convenience name for target.
-matrix: CMakeFiles/matrix.dir/rule
-.PHONY : matrix
-
-# clean rule for target.
-CMakeFiles/matrix.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/clean
-.PHONY : CMakeFiles/matrix.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
