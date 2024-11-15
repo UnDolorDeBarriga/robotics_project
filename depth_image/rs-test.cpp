@@ -6,15 +6,15 @@
 #include <fstream>
 #include <vector>
 #include <array>
-#include <vector>
 #include <Eigen/Dense>
+#include <chrono>
+#include <thread>
 
 #define MIN_DIST 0.01f  // Set the max distance (in meters) for the color gradient
-//#define MAX_DIST 15.0f  // Set the max distance (in meters) for the color gradient
 #define WIDTH 640
 #define HEIGHT 480
 #define FPS 30
-
+#define N_IMAGES 2
 
 // Function to deproject depth frame into 3D points
 std::vector<Eigen::Vector3f> deproject_depth_to_3d(cv::Mat accumulated_depth, rs2_intrinsics intrinsics, int image_n) {
@@ -55,6 +55,7 @@ int main(int argc, char *argv[]) {
     // Initialize RealSense pipeline
     rs2::pipeline pipeline;
     rs2::config config;
+    config.enable_stream(RS2_STREAM_DEPTH, WIDTH, HEIGHT, RS2_FORMAT_Z16, FPS);
     pipeline.start(config);
     rs2::device dev = pipeline.get_active_profile().get_device();
     if (!dev) {
@@ -64,16 +65,13 @@ int main(int argc, char *argv[]) {
     else {
         printf("Device found.\n");
     }
-    config.enable_stream(RS2_STREAM_DEPTH, WIDTH, WIDTH, RS2_FORMAT_Z16, FPS);
-    
 
     // Get depth intrinsics
     rs2_intrinsics intrinsics;
 
-
-
-    for (int image_n = 0; image_n < 2; image_n++) {
-        // Initialize OpenCV matrices to accumulate depth data
+    for (int image_n = 0; image_n < N_IMAGES; image_n++) {
+        int max_depth = max_dist * 1000;  // Convert max distance to millimeters
+        // Reinitialize OpenCV matrices to accumulate depth data
         cv::Mat accumulated_depth = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         cv::Mat valid_pixel_count = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         
@@ -82,19 +80,16 @@ int main(int argc, char *argv[]) {
             rs2::frameset frames = pipeline.wait_for_frames();
             rs2::depth_frame depth_frame = frames.get_depth_frame();
             intrinsics = depth_frame.get_profile().as<rs2::video_stream_profile>().get_intrinsics();
-            
 
             cv::Mat depth_data = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
 
             // Normalize depth values to max distance (in millimeters)
-            int max_depth = max_dist * 1000;  // Convert max distance to millimeters
-            int min_depth = MIN_DIST * 1000;  // Convert max distance to millimeters
             for (int i = 0; i < WIDTH; i++){
                 for (int j = 0; j < HEIGHT; j++){
                     float depth = depth_frame.get_distance(i, j);
                     if (depth >= 0) {
                         if (depth >= max_depth) {
-                            depth_data.at<float>(j, i) = max_depth*1000;
+                            depth_data.at<float>(j, i) = max_depth;
                         }
                         else {
                             depth_data.at<float>(j, i) = depth * 1000;  // Convert depth to millimeters
@@ -107,9 +102,7 @@ int main(int argc, char *argv[]) {
                 }
             }
             // Accumulate depth data
-            cv::Mat depth_float;
             accumulated_depth += depth_data;
-
         }
 
         // Compute the mean depth image
@@ -122,9 +115,13 @@ int main(int argc, char *argv[]) {
         }
         // Normalize and convert to 8-bit for visualization
         cv::Mat mean_depth_image;
-        cv::normalize(accumulated_depth, mean_depth_image, 0, 255, cv::NORM_MINMAX, -1, cv::Mat());
+        accumulated_depth.convertTo(mean_depth_image, CV_8UC1, 255.0 / (max_depth), -255.0 / (max_depth));
+        // cv::normalize(accumulated_depth, mean_depth_image, 0, 255, cv::NORM_MINMAX, -1, cv::Mat());
+        // mean_depth_image.convertTo(mean_depth_image, CV_8UC1);
         // Normalize with a fixed input range of (min_depth, max_depth) to an output range (0, 255)
-        mean_depth_image.convertTo(mean_depth_image, CV_8UC1);
+
+
+
 
         // Apply color map
         cv::Mat depth_color;
@@ -134,7 +131,6 @@ int main(int argc, char *argv[]) {
         char filename[50];
         sprintf(filename, "../data/mean%d_depth_image%d.png", n_index, image_n);
         cv::imwrite(filename, depth_color);
-
 
         // Open a CSV file to write the depth data
         sprintf(filename, "../data/mean%d_depth%d.csv", n_index, image_n);
@@ -158,12 +154,12 @@ int main(int argc, char *argv[]) {
         auto points_image = deproject_depth_to_3d(accumulated_depth, intrinsics, image_n);
 
         // Wait for a keyboard input
-        if (image_n == 0) {
-            printf("Image 0 done.\nPress any key to continue...\n");
+        if (image_n != N_IMAGES-1) {
+            printf("Image %d done.\nPress any key to continue...\n", image_n);
             getchar();
         }
         else {
-            printf("Image 1 done.\n");
+            printf("Image %d done.\n", image_n);
         }
     }
     // Stop the pipeline
