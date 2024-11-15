@@ -15,6 +15,10 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/lib/aarch64-linux-gnu/cmake/opencv4/OpenCVConfig.cmake"
   "/usr/lib/aarch64-linux-gnu/cmake/opencv4/OpenCVModules-release.cmake"
   "/usr/lib/aarch64-linux-gnu/cmake/opencv4/OpenCVModules.cmake"
+  "/usr/local/lib/cmake/glfw3/glfw3Config.cmake"
+  "/usr/local/lib/cmake/glfw3/glfw3ConfigVersion.cmake"
+  "/usr/local/lib/cmake/glfw3/glfw3Targets-release.cmake"
+  "/usr/local/lib/cmake/glfw3/glfw3Targets.cmake"
   "/usr/local/lib/cmake/realsense2/realsense2Config.cmake"
   "/usr/local/lib/cmake/realsense2/realsense2ConfigVersion.cmake"
   "/usr/local/lib/cmake/realsense2/realsense2Targets-release.cmake"
@@ -31,6 +35,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.25/Modules/Compiler/GNU-C.cmake"
   "/usr/share/cmake-3.25/Modules/Compiler/GNU-CXX.cmake"
   "/usr/share/cmake-3.25/Modules/Compiler/GNU.cmake"
+  "/usr/share/cmake-3.25/Modules/FindOpenGL.cmake"
   "/usr/share/cmake-3.25/Modules/FindPackageHandleStandardArgs.cmake"
   "/usr/share/cmake-3.25/Modules/FindPackageMessage.cmake"
   "/usr/share/cmake-3.25/Modules/Platform/Linux-GNU-C.cmake"
@@ -57,5 +62,4 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/rs-test.dir/DependInfo.cmake"
-  "CMakeFiles/matrix.dir/DependInfo.cmake"
   )

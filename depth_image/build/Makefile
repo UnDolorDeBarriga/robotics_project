@@ -129,43 +129,6 @@ rs-test/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/build
 .PHONY : rs-test/fast
 
-#=============================================================================
-# Target rules for targets named matrix
-
-# Build rule for target.
-matrix: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 matrix
-.PHONY : matrix
-
-# fast build rule for target.
-matrix/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/build
-.PHONY : matrix/fast
-
-matrix.o: matrix.cpp.o
-.PHONY : matrix.o
-
-# target to build an object file
-matrix.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/matrix.cpp.o
-.PHONY : matrix.cpp.o
-
-matrix.i: matrix.cpp.i
-.PHONY : matrix.i
-
-# target to preprocess a source file
-matrix.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/matrix.cpp.i
-.PHONY : matrix.cpp.i
-
-matrix.s: matrix.cpp.s
-.PHONY : matrix.s
-
-# target to generate assembly for a file
-matrix.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/matrix.cpp.s
-.PHONY : matrix.cpp.s
-
 rs-test.o: rs-test.cpp.o
 .PHONY : rs-test.o
 
@@ -198,11 +161,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... matrix"
 	@echo "... rs-test"
-	@echo "... matrix.o"
-	@echo "... matrix.i"
-	@echo "... matrix.s"
 	@echo "... rs-test.o"
 	@echo "... rs-test.i"
 	@echo "... rs-test.s"
