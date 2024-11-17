@@ -14,7 +14,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Add executables
-add_executable(matrix ../matrici.cpp ../vector.cpp ../spatial_t.cpp)
+add_executable(matrix ../matrici.cpp ../spatial_transf.cpp)
 
 # Link libraries
 target_link_libraries(matrix ${realsense2_LIBRARY} ${OpenCV_LIBS} Eigen3::Eigen)
