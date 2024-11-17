@@ -42,6 +42,45 @@ std::vector<Eigen::Vector3f> deproject_depth_to_3d(cv::Mat accumulated_depth, rs
     return points;
 }
 
+// Open a CSV file to write the depth data
+void write_depth_to_csv(cv::Mat accumulated_depth, int n_index, int image_n) {
+    char filename[50];
+    sprintf(filename, "../data/mean%d_depth%d.csv", n_index, image_n);
+    std::ofstream csv_file(filename);
+    if (!csv_file.is_open()) {
+        printf("Failed to open the CSV file.\n");
+        return;
+    }
+    // Write the depth data to the CSV file
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            float depth_mm = accumulated_depth.at<float>(y, x);
+            csv_file << depth_mm << ",";
+        }
+        csv_file << "\n";
+    }
+    // Close the CSV file
+    csv_file.close();
+    return;
+}
+
+void write_depth_to_image(cv::Mat accumulated_depth, int max_depth, int n_index, int image_n) {
+    // Normalize and convert to 8-bit for visualization
+    cv::Mat mean_depth_image;
+    accumulated_depth.convertTo(mean_depth_image, CV_8UC1, 255.0 / (max_depth), -255.0 / (max_depth));
+
+    // Apply color map
+    cv::Mat depth_color;
+    cv::applyColorMap(mean_depth_image, depth_color, cv::COLORMAP_JET);
+
+    // Save the mean depth image
+    char filename[50];
+    sprintf(filename, "../data/mean%d_depth_image%d.png", n_index, image_n);
+    cv::imwrite(filename, depth_color);
+    return;
+}
+
+
 // Main function
 int main(int argc, char *argv[]) {
     if (argc != 3) {
@@ -50,7 +89,7 @@ int main(int argc, char *argv[]) {
     }
     int max_dist = atoi(argv[1]);
     int n_index = atoi(argv[2]);
-    rs2_error* e = 0;
+    int max_depth = max_dist * 1000;  // Convert max distance to millimeters
 
     // Initialize RealSense pipeline
     rs2::pipeline pipeline;
@@ -68,9 +107,8 @@ int main(int argc, char *argv[]) {
 
     // Get depth intrinsics
     rs2_intrinsics intrinsics;
-
+    
     for (int image_n = 0; image_n < N_IMAGES; image_n++) {
-        int max_depth = max_dist * 1000;  // Convert max distance to millimeters
         // Reinitialize OpenCV matrices to accumulate depth data
         cv::Mat accumulated_depth = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         cv::Mat valid_pixel_count = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
@@ -113,46 +151,15 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-        // Normalize and convert to 8-bit for visualization
-        cv::Mat mean_depth_image;
-        accumulated_depth.convertTo(mean_depth_image, CV_8UC1, 255.0 / (max_depth), -255.0 / (max_depth));
-        // cv::normalize(accumulated_depth, mean_depth_image, 0, 255, cv::NORM_MINMAX, -1, cv::Mat());
-        // mean_depth_image.convertTo(mean_depth_image, CV_8UC1);
-        // Normalize with a fixed input range of (min_depth, max_depth) to an output range (0, 255)
-
-
-
-
-        // Apply color map
-        cv::Mat depth_color;
-        cv::applyColorMap(mean_depth_image, depth_color, cv::COLORMAP_JET);
-
-        // Save the mean depth image
-        char filename[50];
-        sprintf(filename, "../data/mean%d_depth_image%d.png", n_index, image_n);
-        cv::imwrite(filename, depth_color);
-
-        // Open a CSV file to write the depth data
-        sprintf(filename, "../data/mean%d_depth%d.csv", n_index, image_n);
-        std::ofstream csv_file(filename);
-        if (!csv_file.is_open()) {
-            printf("Failed to open the CSV file.\n");
-            return EXIT_FAILURE;
-        }
-        // Write the depth data to the CSV file
-        for (int y = 0; y < HEIGHT; ++y) {
-            for (int x = 0; x < WIDTH; ++x) {
-                float depth_mm = accumulated_depth.at<float>(y, x);
-                csv_file << depth_mm << ",";
-            }
-            csv_file << "\n";
-        }
-        // Close the CSV file
-        csv_file.close();
-
+        
+        // Write the depth data to a CSV file
+        write_depth_to_csv(accumulated_depth, n_index, image_n);
+        
         // Deproject the mean depth image into 3D points
         auto points_image = deproject_depth_to_3d(accumulated_depth, intrinsics, image_n);
-
+        
+        write_depth_to_image(accumulated_depth, max_depth, n_index, image_n);
+        
         // Wait for a keyboard input
         if (image_n != N_IMAGES-1) {
             printf("Image %d done.\nPress any key to continue...\n", image_n);

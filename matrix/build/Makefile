@@ -153,53 +153,29 @@ matrici.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/matrici.cpp.s
 .PHONY : matrici.cpp.s
 
-spatial_t.o: spatial_t.cpp.o
-.PHONY : spatial_t.o
+spatial_transf.o: spatial_transf.cpp.o
+.PHONY : spatial_transf.o
 
 # target to build an object file
-spatial_t.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/spatial_t.cpp.o
-.PHONY : spatial_t.cpp.o
+spatial_transf.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/spatial_transf.cpp.o
+.PHONY : spatial_transf.cpp.o
 
-spatial_t.i: spatial_t.cpp.i
-.PHONY : spatial_t.i
-
-# target to preprocess a source file
-spatial_t.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/spatial_t.cpp.i
-.PHONY : spatial_t.cpp.i
-
-spatial_t.s: spatial_t.cpp.s
-.PHONY : spatial_t.s
-
-# target to generate assembly for a file
-spatial_t.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/spatial_t.cpp.s
-.PHONY : spatial_t.cpp.s
-
-vector.o: vector.cpp.o
-.PHONY : vector.o
-
-# target to build an object file
-vector.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/vector.cpp.o
-.PHONY : vector.cpp.o
-
-vector.i: vector.cpp.i
-.PHONY : vector.i
+spatial_transf.i: spatial_transf.cpp.i
+.PHONY : spatial_transf.i
 
 # target to preprocess a source file
-vector.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/vector.cpp.i
-.PHONY : vector.cpp.i
+spatial_transf.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/spatial_transf.cpp.i
+.PHONY : spatial_transf.cpp.i
 
-vector.s: vector.cpp.s
-.PHONY : vector.s
+spatial_transf.s: spatial_transf.cpp.s
+.PHONY : spatial_transf.s
 
 # target to generate assembly for a file
-vector.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/vector.cpp.s
-.PHONY : vector.cpp.s
+spatial_transf.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/spatial_transf.cpp.s
+.PHONY : spatial_transf.cpp.s
 
 # Help Target
 help:
@@ -213,12 +189,9 @@ help:
 	@echo "... matrici.o"
 	@echo "... matrici.i"
 	@echo "... matrici.s"
-	@echo "... spatial_t.o"
-	@echo "... spatial_t.i"
-	@echo "... spatial_t.s"
-	@echo "... vector.o"
-	@echo "... vector.i"
-	@echo "... vector.s"
+	@echo "... spatial_transf.o"
+	@echo "... spatial_transf.i"
+	@echo "... spatial_transf.s"
 .PHONY : help
 
 

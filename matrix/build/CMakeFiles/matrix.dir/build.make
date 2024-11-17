@@ -83,46 +83,30 @@ CMakeFiles/matrix.dir/matrici.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/matrix.dir/matrici.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/arnau/Desktop/robotics_project/matrix/matrici.cpp -o CMakeFiles/matrix.dir/matrici.cpp.s
 
-CMakeFiles/matrix.dir/vector.cpp.o: CMakeFiles/matrix.dir/flags.make
-CMakeFiles/matrix.dir/vector.cpp.o: /home/arnau/Desktop/robotics_project/matrix/vector.cpp
-CMakeFiles/matrix.dir/vector.cpp.o: CMakeFiles/matrix.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/matrix.dir/vector.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/matrix.dir/vector.cpp.o -MF CMakeFiles/matrix.dir/vector.cpp.o.d -o CMakeFiles/matrix.dir/vector.cpp.o -c /home/arnau/Desktop/robotics_project/matrix/vector.cpp
+CMakeFiles/matrix.dir/spatial_transf.cpp.o: CMakeFiles/matrix.dir/flags.make
+CMakeFiles/matrix.dir/spatial_transf.cpp.o: /home/arnau/Desktop/robotics_project/matrix/spatial_transf.cpp
+CMakeFiles/matrix.dir/spatial_transf.cpp.o: CMakeFiles/matrix.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/matrix.dir/spatial_transf.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/matrix.dir/spatial_transf.cpp.o -MF CMakeFiles/matrix.dir/spatial_transf.cpp.o.d -o CMakeFiles/matrix.dir/spatial_transf.cpp.o -c /home/arnau/Desktop/robotics_project/matrix/spatial_transf.cpp
 
-CMakeFiles/matrix.dir/vector.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/matrix.dir/vector.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/arnau/Desktop/robotics_project/matrix/vector.cpp > CMakeFiles/matrix.dir/vector.cpp.i
+CMakeFiles/matrix.dir/spatial_transf.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/matrix.dir/spatial_transf.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/arnau/Desktop/robotics_project/matrix/spatial_transf.cpp > CMakeFiles/matrix.dir/spatial_transf.cpp.i
 
-CMakeFiles/matrix.dir/vector.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/matrix.dir/vector.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/arnau/Desktop/robotics_project/matrix/vector.cpp -o CMakeFiles/matrix.dir/vector.cpp.s
-
-CMakeFiles/matrix.dir/spatial_t.cpp.o: CMakeFiles/matrix.dir/flags.make
-CMakeFiles/matrix.dir/spatial_t.cpp.o: /home/arnau/Desktop/robotics_project/matrix/spatial_t.cpp
-CMakeFiles/matrix.dir/spatial_t.cpp.o: CMakeFiles/matrix.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/matrix.dir/spatial_t.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/matrix.dir/spatial_t.cpp.o -MF CMakeFiles/matrix.dir/spatial_t.cpp.o.d -o CMakeFiles/matrix.dir/spatial_t.cpp.o -c /home/arnau/Desktop/robotics_project/matrix/spatial_t.cpp
-
-CMakeFiles/matrix.dir/spatial_t.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/matrix.dir/spatial_t.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/arnau/Desktop/robotics_project/matrix/spatial_t.cpp > CMakeFiles/matrix.dir/spatial_t.cpp.i
-
-CMakeFiles/matrix.dir/spatial_t.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/matrix.dir/spatial_t.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/arnau/Desktop/robotics_project/matrix/spatial_t.cpp -o CMakeFiles/matrix.dir/spatial_t.cpp.s
+CMakeFiles/matrix.dir/spatial_transf.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/matrix.dir/spatial_transf.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/arnau/Desktop/robotics_project/matrix/spatial_transf.cpp -o CMakeFiles/matrix.dir/spatial_transf.cpp.s
 
 # Object files for target matrix
 matrix_OBJECTS = \
 "CMakeFiles/matrix.dir/matrici.cpp.o" \
-"CMakeFiles/matrix.dir/vector.cpp.o" \
-"CMakeFiles/matrix.dir/spatial_t.cpp.o"
+"CMakeFiles/matrix.dir/spatial_transf.cpp.o"
 
 # External object files for target matrix
 matrix_EXTERNAL_OBJECTS =
 
 matrix: CMakeFiles/matrix.dir/matrici.cpp.o
-matrix: CMakeFiles/matrix.dir/vector.cpp.o
-matrix: CMakeFiles/matrix.dir/spatial_t.cpp.o
+matrix: CMakeFiles/matrix.dir/spatial_transf.cpp.o
 matrix: CMakeFiles/matrix.dir/build.make
 matrix: /usr/local/lib/librealsense2.so.2.55.1
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_stitching.so.4.6.0
@@ -182,7 +166,7 @@ matrix: /usr/lib/aarch64-linux-gnu/libopencv_photo.so.4.6.0
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_imgproc.so.4.6.0
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_core.so.4.6.0
 matrix: CMakeFiles/matrix.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable matrix"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable matrix"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/matrix.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
