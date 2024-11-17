@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /home/arnau/Desktop/robotics_project/depth_image/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/rs-test.dir/all
+all: CMakeFiles/main.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +71,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/rs-test.dir/clean
+clean: CMakeFiles/main.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/rs-test.dir
+# Target rules for target CMakeFiles/main.dir
 
 # All Build rule for target.
-CMakeFiles/rs-test.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles --progress-num=1,2 "Built target rs-test"
-.PHONY : CMakeFiles/rs-test.dir/all
+CMakeFiles/main.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles --progress-num=1,2 "Built target main"
+.PHONY : CMakeFiles/main.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/rs-test.dir/rule: cmake_check_build_system
+CMakeFiles/main.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/rs-test.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/main.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles 0
-.PHONY : CMakeFiles/rs-test.dir/rule
+.PHONY : CMakeFiles/main.dir/rule
 
 # Convenience name for target.
-rs-test: CMakeFiles/rs-test.dir/rule
-.PHONY : rs-test
+main: CMakeFiles/main.dir/rule
+.PHONY : main
 
 # clean rule for target.
-CMakeFiles/rs-test.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/clean
-.PHONY : CMakeFiles/rs-test.dir/clean
+CMakeFiles/main.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/clean
+.PHONY : CMakeFiles/main.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

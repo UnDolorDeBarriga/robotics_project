@@ -117,41 +117,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named rs-test
+# Target rules for targets named main
 
 # Build rule for target.
-rs-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 rs-test
-.PHONY : rs-test
+main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 main
+.PHONY : main
 
 # fast build rule for target.
-rs-test/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/build
-.PHONY : rs-test/fast
+main/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
+.PHONY : main/fast
 
-rs-test.o: rs-test.cpp.o
-.PHONY : rs-test.o
+main.o: main.cpp.o
+.PHONY : main.o
 
 # target to build an object file
-rs-test.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/rs-test.cpp.o
-.PHONY : rs-test.cpp.o
+main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.o
+.PHONY : main.cpp.o
 
-rs-test.i: rs-test.cpp.i
-.PHONY : rs-test.i
+main.i: main.cpp.i
+.PHONY : main.i
 
 # target to preprocess a source file
-rs-test.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/rs-test.cpp.i
-.PHONY : rs-test.cpp.i
+main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.i
+.PHONY : main.cpp.i
 
-rs-test.s: rs-test.cpp.s
-.PHONY : rs-test.s
+main.s: main.cpp.s
+.PHONY : main.s
 
 # target to generate assembly for a file
-rs-test.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs-test.dir/build.make CMakeFiles/rs-test.dir/rs-test.cpp.s
-.PHONY : rs-test.cpp.s
+main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.s
+.PHONY : main.cpp.s
 
 # Help Target
 help:
@@ -161,10 +161,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... rs-test"
-	@echo "... rs-test.o"
-	@echo "... rs-test.i"
-	@echo "... rs-test.s"
+	@echo "... main"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 .PHONY : help
 
 
