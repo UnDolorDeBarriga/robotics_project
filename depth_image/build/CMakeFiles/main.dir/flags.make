@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DELPP_NO_DEFAULT_LOG_FILE
 
-CXX_INCLUDES = -isystem /usr/include/opencv4 -isystem /usr/include/eigen3
+CXX_INCLUDES = -I/usr/include/eigen3 -isystem /usr/include/opencv4
 
 CXX_FLAGS = 
 

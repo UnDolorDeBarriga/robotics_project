@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/arnau/Desktop/robotics_project/depth_image/main.cpp" "CMakeFiles/main.dir/main.cpp.o" "gcc" "CMakeFiles/main.dir/main.cpp.o.d"
+  "/home/arnau/Desktop/robotics_project/depth_image/resources.cpp" "CMakeFiles/main.dir/resources.cpp.o" "gcc" "CMakeFiles/main.dir/resources.cpp.o.d"
   )
 
 # Targets to which this target links.
