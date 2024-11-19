@@ -87,7 +87,12 @@ int main(int argc, char *argv[]) {
         // Get the user points for the camera position and angle
         Eigen::Vector3f camera_position;
         Eigen::Vector3f camera_angle;
-        //get_user_points(image_n, camera_position, camera_angle);
+        get_user_points(image_n, camera_position, camera_angle);
+
+
+            //TODO: MAke a function with matrici.cpp content
+            //TODO: Write the transformed points to a files
+            //TODO: Make the bigg ass matrice
 
         // Wait for a keyboard input
         if (image_n != N_IMAGES-1) {
