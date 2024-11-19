@@ -16,9 +16,9 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Add executables
-add_executable(main ../main.cpp)
+add_executable(main ../main.cpp ../resources.cpp)
 
 # Link libraries
-target_link_libraries(main ${realsense2_LIBRARY} ${OpenCV_LIBS})
+target_link_libraries(main ${realsense2_LIBRARY} ${OpenCV_LIBS} ${EIGEN3_LIBRARIES} ${OPENGL_LIBRARIES} glfw)
 
 # g++ -o rs-test rs-test.cpp -I/usr/local/include -L/usr/local/lib -lrealsense2 `pkg-config --cflags --libs opencv4`
