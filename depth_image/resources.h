@@ -17,17 +17,23 @@
 
 using namespace Eigen;
 using namespace std;
+using namespace rs2;
+using namespace cv;
 
 // Function declarations
-void write_depth_to_csv(cv::Mat depth_matrix, int n_index, int image_n);
-std::vector<Eigen::Vector3f> deproject_depth_to_3d(const char i_filename[], cv::Mat depth_matrix, rs2_intrinsics intrinsics, int image_n);
-void get_mean_depth(cv::Mat &accumulated_depth, cv::Mat valid_pixel_count);
-void write_depth_to_image(cv::Mat depth_matrix, int max_depth, int n_index, int image_n);
+void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n);
+vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n);
+void get_mean_depth(Mat &accumulated_depth, Mat valid_pixel_count);
+void write_depth_to_image(Mat depth_matrix, int max_depth, int n_index, int image_n);
 void get_user_points(int image_n, Vector3f &camera_position, Vector3f &camera_angle);
 
 Matrix4d RotationMatrix(int axis, double angle);
 Matrix4d TranslationMatrix(double tx, double ty, double tz);
-void read_txt(const char i_filename[], const char o_filename[] Matrix4d M);
+void transformate_cordinates(const char i_filename[],const char o_filename[], Matrix4d M, double& maxAbsX, double& maxAbsY);
+Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_angle);
+void findMaxAbsoluteXY(const char i_filename[], double& maxAbsX, double& maxAbsY);
+
+MatrixXd createMatrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col);
 
 #endif // RESOURCES_H
 

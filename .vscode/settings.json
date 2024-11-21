@@ -65,5 +65,6 @@
         "core": "cpp",
         "dense": "cpp"
     },
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "cmake.sourceDirectory": "/home/arnau/Desktop/robotics_project/depth_image"
 }
