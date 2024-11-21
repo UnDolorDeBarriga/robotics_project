@@ -27,13 +27,13 @@ void get_mean_depth(Mat &accumulated_depth, Mat valid_pixel_count);
 void write_depth_to_image(Mat depth_matrix, int max_depth, int n_index, int image_n);
 void get_user_points(int image_n, Vector3f &camera_position, Vector3f &camera_angle);
 
-Matrix4d RotationMatrix(int axis, double angle);
-Matrix4d TranslationMatrix(double tx, double ty, double tz);
+Matrix4d rotation_matrix(int axis, double angle);
+Matrix4d translation_matrix(double tx, double ty, double tz);
 void transformate_cordinates(const char i_filename[],const char o_filename[], Matrix4d M, double& maxAbsX, double& maxAbsY);
 Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_angle);
-void findMaxAbsoluteXY(const char i_filename[], double& maxAbsX, double& maxAbsY);
 
-MatrixXd createMatrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col);
+MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col);
+void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim);
 
 #endif // RESOURCES_H
 
