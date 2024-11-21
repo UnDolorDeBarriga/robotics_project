@@ -22,6 +22,8 @@ int main(int argc, char *argv[]) {
     int center_x;
     int center_y;
 
+    vector<string> filenames;
+
     // Initialize RealSense pipeline
     pipeline pipeline;
     config config;
@@ -78,6 +80,7 @@ int main(int argc, char *argv[]) {
         sprintf(i_filename, "../data/camera_points_image%d.txt", image_n);
         char o_filename[100];
         sprintf(o_filename, "../data/reference_points_image%d.txt", image_n);
+        filenames.push_back(o_filename);
     
         // Compute the mean depth image
         get_mean_depth(accumulated_depth, valid_pixel_count);
@@ -94,12 +97,13 @@ int main(int argc, char *argv[]) {
         // Get the user points for the camera position and angle
         Vector3f camera_position;
         Vector3f camera_angle;
-        get_user_points(image_n, camera_position, camera_angle);
+        //get_user_points(image_n, camera_position, camera_angle);
+        camera_position = Vector3f(0.0, 0.0, 0.0);
+        camera_angle = Vector3f(0.0, 0.0, 0.0);
 
         Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
 
         transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY);
-
 
         // Wait for a keyboard input
         if (image_n != N_IMAGES-1) {
@@ -109,8 +113,20 @@ int main(int argc, char *argv[]) {
             printf("Image %d done.\n", image_n);
         }
     }
-    MatrixXd big_ass_matrix;
-    big_ass_matrix = createMatrix(maxAbsX, maxAbsY, cell_dim, center_y, center_x);
+    MatrixXd big_ass_matrix_combined = create_matrix(maxAbsX, maxAbsY, cell_dim, center_y, center_x);
+
+    
+    MatrixXd big_ass_matrix1 = big_ass_matrix_combined;
+    MatrixXd big_ass_matrix2 = big_ass_matrix_combined;
+    
+    vector<MatrixXd> matrices = {big_ass_matrix1, big_ass_matrix2};
+    for(int i = 0; i < 1; i++){
+        populate_matrix_from_file(filenames[i].c_str(), matrices[i], center_y, center_x, cell_dim);
+    }
+
+    printf("N Rows: %d\n", big_ass_matrix_combined.rows());
+    printf("N Cols: %d\n", big_ass_matrix_combined.cols());
+    //cout << matrices[0];
 
 
     // Stop the pipeline

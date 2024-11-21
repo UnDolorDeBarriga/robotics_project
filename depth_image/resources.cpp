@@ -154,7 +154,7 @@ void get_user_points(int image_n, Vector3f &camera_position, Vector3f &camera_an
  * @return Eigen::Matrix4d The resulting 4x4 rotation matrix.
  * @throws std::invalid_argument if the axis is not 1, 2, or 3.
  */
-Matrix4d RotationMatrix(int axis, double angle) {
+Matrix4d rotation_matrix(int axis, double angle) {
     double rad = angle * M_PI / 180.0;
     Matrix4d rotation = Matrix4d::Identity();
     switch (axis) {
@@ -193,7 +193,7 @@ Matrix4d RotationMatrix(int axis, double angle) {
  * @param tz The translation distance along the Z axis.
  * @return Eigen::Matrix4d A 4x4 matrix representing the translation.
  */
-Matrix4d TranslationMatrix(double tx, double ty, double tz) {
+Matrix4d translation_matrix(double tx, double ty, double tz) {
     Matrix4d translation = Matrix4d::Identity();
     translation(0, 3) = tx;
     translation(1, 3) = ty;
@@ -242,11 +242,11 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
         vec(2) = stod(temp);
         vec=M*vec;
         myout << vec(0) << "," << vec(1) << "," << vec(2) << endl;
-        if(abs(vec(0))>maxAbsX){
-            maxAbsX=vec(0);
+        if(std::abs(vec(0))>maxAbsX){
+            maxAbsX = std::abs(vec(0));
         }
-        if(abs(vec(1))>maxAbsY){
-            maxAbsY=vec(1);
+        if(std::abs(vec(1)) > maxAbsY){
+            maxAbsY = std::abs(vec(1));
         }
     }
     myin.close();
@@ -267,11 +267,11 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
  * @return Eigen::Matrix4d The resulting 4x4 transformation matrix.
  */
 Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_angle){
-    Matrix4d Rx = RotationMatrix(1, camera_angle[0]);
-    Matrix4d Ry = RotationMatrix(2, camera_angle[1]);
-    Matrix4d Rz = RotationMatrix(3, camera_angle[2]);
+    Matrix4d Rx = rotation_matrix(1, camera_angle[0]);
+    Matrix4d Ry = rotation_matrix(2, camera_angle[1]);
+    Matrix4d Rz = rotation_matrix(3, camera_angle[2]);
 
-    Matrix4d T= TranslationMatrix(camera_position[0], camera_position[1], camera_position[2]);
+    Matrix4d T= translation_matrix(camera_position[0], camera_position[1], camera_position[2]);
     Matrix4d M = T * Rx * Ry *Rz ;
     return M;
 }
@@ -292,7 +292,7 @@ Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_
  * @param center_point_col Reference to an integer where the column index of the center point will be stored.
  * @return MatrixXd A matrix of zeros with the calculated dimensions.
  */
-MatrixXd createMatrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col) {
+MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col) {
     int num_rows = ceil((2 * maxAbsY) / cell_dim);
     int num_cols = ceil((2 * maxAbsX) / cell_dim);
     MatrixXd z_matrix = MatrixXd::Zero(num_rows+1, num_cols+1);
@@ -301,4 +301,49 @@ MatrixXd createMatrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_
     center_point_row = num_rows / 2;
     center_point_col = num_cols / 2;
     return z_matrix;
+}
+
+
+
+
+/**
+ * @brief Populates a matrix from a file containing 3D coordinates.
+ * 
+ * This function reads 3D coordinates from an input file and populates a matrix with the z-values.
+ * The matrix is centered around a specified center point, and the coordinates are scaled based on the cell dimension.
+ * 
+ * @param i_filename The path to the input file containing 3D coordinates.
+ * @param matrix The matrix to be populated with z-values.
+ * @param center_point_row The row index of the center point in the matrix.
+ * @param center_point_col The column index of the center point in the matrix.
+ * @param cell_dim The dimension of each cell in the matrix.
+ */
+void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim) {
+    ifstream file(i_filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file!" << endl;
+        return;
+    }
+    int row, col;
+    string line;
+    while (getline(file, line)) {
+        istringstream iss(line);
+        double x, y, z;
+        char comma1, comma2;
+        if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
+            cerr << "Invalid line format: " << line << endl;
+            continue;
+        }
+
+        col = center_point_col + static_cast<int>(floor(x / cell_dim));
+        row = center_point_row - static_cast<int>(floor(y / cell_dim));
+ 
+
+        if (row >= 0 && row < matrix.rows() && col >= 0 && col < matrix.cols()) {
+            matrix(row, col) = static_cast<int>(round(z)); // Assign the z value to the appropriate cell
+        } else {
+            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: "<< row <<" col: " <<col<<")" << endl;
+        }
+    }
+    file.close();
 }
