@@ -1,9 +1,6 @@
 #include "resources.h"
 #include <fstream>
 
-using namespace Eigen;
-using namespace std;
-
 /**
  * @brief Writes the depth matrix data to a CSV file.
  * 
@@ -11,7 +8,7 @@ using namespace std;
  * @param n_index The index of the current image.
  * @param image_n The image number.
  */
-void write_depth_to_csv(cv::Mat depth_matrix, int n_index, int image_n) {
+void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n) {
     char filename[50];
     sprintf(filename, "../data/mean%d_depth%d.csv", n_index, image_n);
     ofstream csv_file(filename);
@@ -39,7 +36,7 @@ void write_depth_to_csv(cv::Mat depth_matrix, int n_index, int image_n) {
  * @param image_n The image number.
  * @return std::vector<Eigen::Vector3f> The 3D points.
  */
-vector<Eigen::Vector3f> deproject_depth_to_3d(const char i_filename[], cv::Mat depth_matrix, rs2_intrinsics intrinsics, int image_n) {
+vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n) {
     vector<Eigen::Vector3f> points;
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
@@ -66,7 +63,7 @@ vector<Eigen::Vector3f> deproject_depth_to_3d(const char i_filename[], cv::Mat d
  * @param accumulated_depth The depth matrix to be averages.
  * @param valid_pixel_count The matrix of number of valid pixels.
  */
-void get_mean_depth(cv::Mat &accumulated_depth, cv::Mat valid_pixel_count) {
+void get_mean_depth(Mat &accumulated_depth, Mat valid_pixel_count) {
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
             if (valid_pixel_count.at<int>(y, x) > 0) {
@@ -85,14 +82,14 @@ void get_mean_depth(cv::Mat &accumulated_depth, cv::Mat valid_pixel_count) {
  * @param n_index The index of the current depth image.
  * @param image_n The image number.
  */
-void write_depth_to_image(cv::Mat depth_matrix, int max_depth, int n_index, int image_n) {
-    cv::Mat mean_depth_image;
+void write_depth_to_image(Mat depth_matrix, int max_depth, int n_index, int image_n) {
+    Mat mean_depth_image;
     depth_matrix.convertTo(mean_depth_image, CV_8UC1, 255.0 / (max_depth), -255.0 / (max_depth));
-    cv::Mat depth_color;
-    cv::applyColorMap(mean_depth_image, depth_color, cv::COLORMAP_JET);
+    Mat depth_color;
+    applyColorMap(mean_depth_image, depth_color, COLORMAP_JET);
     char filename[50];
     sprintf(filename, "../data/mean%d_depth_image%d.png", n_index, image_n);
-    cv::imwrite(filename, depth_color);
+    imwrite(filename, depth_color);
     return;
 }
 
@@ -208,14 +205,17 @@ Matrix4d TranslationMatrix(double tx, double ty, double tz) {
 /**
  * @brief Reads a text file containing 3D coordinates, applies a transformation matrix, and writes the transformed coordinates to an output file.
  * 
- * @param i_filename The input file name containing 3D camera cordinated system.
- * @param o_filename The output file name where the transformed coordinates in the set position cordinates.
- * @param M The 4x4 transformation matrix to be applied to the 3D coordinates.
+ * This function reads 3D coordinates from an input text file, applies a 4x4 transformation matrix to each coordinate, and writes the transformed coordinates to an output text file. It also calculates the maximum absolute values of the transformed x and y coordinates.
  * 
- * The function reads each line from the input file, parses the 3D coordinates, applies the transformation matrix, 
- * and writes the transformed coordinates to the output file. If the input file cannot be opened, an error message is printed.
+ * @param i_filename The path to the input text file containing 3D coordinates. Each line should contain three comma-separated values representing x, y, and z coordinates.
+ * @param o_filename The path to the output text file where the transformed coordinates will be written. Each line will contain three comma-separated values representing the transformed x, y, and z coordinates.
+ * @param M A 4x4 transformation matrix to be applied to each 3D coordinate.
+ * @param maxAbsX A reference to a double variable where the maximum absolute value of the transformed x coordinates will be stored.
+ * @param maxAbsY A reference to a double variable where the maximum absolute value of the transformed y coordinates will be stored.
+ * 
+ * @throws ios_base::failure If the input file cannot be opened.
  */
-void read_txt(const char i_filename[],const char o_filename[], Matrix4d M) {
+void transformate_cordinates(const char i_filename[],const char o_filename[], Matrix4d M, double& maxAbsX, double& maxAbsY) {
     ifstream myin;
     try {
         myin.open(i_filename);
@@ -232,7 +232,7 @@ void read_txt(const char i_filename[],const char o_filename[], Matrix4d M) {
     while (getline(myin, line)) {
         stringstream ss(line);  
         string temp;
-        Eigen::Vector4d vec;
+        Vector4d vec;
         vec(3)=1;
         getline(ss, temp, ',');
         vec(0) = stod(temp); 
@@ -242,8 +242,63 @@ void read_txt(const char i_filename[],const char o_filename[], Matrix4d M) {
         vec(2) = stod(temp);
         vec=M*vec;
         myout << vec(0) << "," << vec(1) << "," << vec(2) << endl;
+        if(abs(vec(0))>maxAbsX){
+            maxAbsX=vec(0);
+        }
+        if(abs(vec(1))>maxAbsY){
+            maxAbsY=vec(1);
+        }
     }
     myin.close();
     myout.close();
     return;
+}
+
+
+
+/**
+ * @brief Creates a transformation matrix from camera position and angle.
+ * 
+ * This function generates a 4x4 transformation matrix that combines translation and rotation.
+ * The rotation is applied in the order of x-axis, y-axis, and z-axis rotations, followed by translation.
+ * 
+ * @param camera_position A 3D vector representing the camera position (x, y, z).
+ * @param camera_angle A 3D vector representing the camera rotation angles (pitch, yaw, roll) in degrees.
+ * @return Eigen::Matrix4d The resulting 4x4 transformation matrix.
+ */
+Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_angle){
+    Matrix4d Rx = RotationMatrix(1, camera_angle[0]);
+    Matrix4d Ry = RotationMatrix(2, camera_angle[1]);
+    Matrix4d Rz = RotationMatrix(3, camera_angle[2]);
+
+    Matrix4d T= TranslationMatrix(camera_position[0], camera_position[1], camera_position[2]);
+    Matrix4d M = T * Rx * Ry *Rz ;
+    return M;
+}
+
+
+
+/**
+ * @brief Creates a matrix with specified dimensions and calculates the center point.
+ *
+ * This function generates a matrix of zeros with dimensions based on the provided
+ * maximum absolute values for X and Y coordinates and the cell dimension. It also
+ * calculates the center point of the matrix, which corresponds to the origin (x = 0, y = 0).
+ *
+ * @param maxAbsX The maximum absolute value for the X coordinate.
+ * @param maxAbsY The maximum absolute value for the Y coordinate.
+ * @param cell_dim The dimension of each cell in the matrix.
+ * @param center_point_row Reference to an integer where the row index of the center point will be stored.
+ * @param center_point_col Reference to an integer where the column index of the center point will be stored.
+ * @return MatrixXd A matrix of zeros with the calculated dimensions.
+ */
+MatrixXd createMatrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col) {
+    int num_rows = ceil((2 * maxAbsY) / cell_dim);
+    int num_cols = ceil((2 * maxAbsX) / cell_dim);
+    MatrixXd z_matrix = MatrixXd::Zero(num_rows+1, num_cols+1);
+
+    // Determine the center point in the matrix (corresponding to x = 0, y = 0)
+    center_point_row = num_rows / 2;
+    center_point_col = num_cols / 2;
+    return z_matrix;
 }
