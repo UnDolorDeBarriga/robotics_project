@@ -1,8 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/matrix.dir/matrici.cpp.o"
-  "CMakeFiles/matrix.dir/matrici.cpp.o.d"
   "CMakeFiles/matrix.dir/spatial_transf.cpp.o"
-  "CMakeFiles/matrix.dir/spatial_transf.cpp.o.d"
   "matrix"
   "matrix.pdb"
 )

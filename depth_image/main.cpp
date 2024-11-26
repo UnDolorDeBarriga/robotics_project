@@ -119,6 +119,10 @@ int main(int argc, char *argv[]) {
     MatrixXd big_ass_matrix1 = big_ass_matrix_combined;
     MatrixXd big_ass_matrix2 = big_ass_matrix_combined;
     
+    printf("N Rows: %d\n", big_ass_matrix_combined.rows());
+    printf("N Cols: %d\n", big_ass_matrix_combined.cols());
+    
+    return;
     vector<MatrixXd> matrices = {big_ass_matrix1, big_ass_matrix2};
     for(int i = 0; i < 1; i++){
         populate_matrix_from_file(filenames[i].c_str(), matrices[i], center_y, center_x, cell_dim);
