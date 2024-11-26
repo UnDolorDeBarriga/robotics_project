@@ -3,29 +3,28 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <fstream>
-using namespace Eigen;
-using namespace std;
+
 
 Eigen::Matrix4d RotationMatrix(char axis, double angle) {
     double rad = angle * M_PI / 180.0; // Converti l'angolo in radianti
     Matrix4d rotation = Matrix4d::Identity(); // Matrice identità
     
     switch (axis) {
-        case 'x': // Rotazione attorno all'asse x (pitch)
+        case 1: // Rotazione attorno all'asse x (pitch)
             rotation(1, 1) = std::cos(rad);
             rotation(1, 2) = -std::sin(rad);
             rotation(2, 1) = std::sin(rad);
             rotation(2, 2) = std::cos(rad);
             break;
             
-        case 'y': // Rotazione attorno all'asse y (roll)
+        case 2: // Rotazione attorno all'asse y (roll)
             rotation(0, 0) = std::cos(rad);
             rotation(0, 2) = std::sin(rad);
             rotation(2, 0) = -std::sin(rad);
             rotation(2, 2) = std::cos(rad);
             break;
             
-        case 'z': // Rotazione attorno all'asse z (yaw)
+        case 3: // Rotazione attorno all'asse z (yaw)
             rotation(0, 0) = std::cos(rad);
             rotation(0, 1) = -std::sin(rad);
             rotation(1, 0) = std::sin(rad);
@@ -79,4 +78,17 @@ void read_txt(const char i_filename[],const char o_filename[],Eigen::Matrix4d M)
     }
     myin.close();
     myout.close();
+}
+
+
+
+MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col) {
+    int num_rows = ceil((2 * maxAbsY) / cell_dim);
+    int num_cols = ceil((2 * maxAbsX) / cell_dim);
+    MatrixXd z_matrix = MatrixXd::Zero(num_rows+1, num_cols+1);
+
+    // Determine the center point in the matrix (corresponding to x = 0, y = 0)
+    center_point_row = num_rows / 2;
+    center_point_col = num_cols / 2;
+    return z_matrix;
 }
