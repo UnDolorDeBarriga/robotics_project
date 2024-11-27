@@ -129,3 +129,71 @@ void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int ce
     }
     file.close();
 }
+
+void merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim) {
+    ifstream file(i_filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file!" << endl;
+        return;
+    }
+    int row, col;
+    int n=0;
+    int squared_sum=0;
+    string line;
+    while (getline(file, line)) {
+        istringstream iss(line);
+        double x, y, z;
+        char comma1, comma2;
+        if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
+            cerr << "Invalid line format: " << line << endl;
+            continue;
+        }
+        col = center_point_col + static_cast<int>(floor(x / cell_dim));
+        row = center_point_row - static_cast<int>(floor(y / cell_dim));
+        
+
+        if (row >= 0 && row < matrix.rows() && col >= 0 && col < matrix.cols() && matrix(row, col) == 0 && z != 0) {
+            matrix(row, col) = static_cast<int>(round(z)); // Assign the z value to the appropriate cell
+        } else if(row >= 0 && row < matrix.rows() && col >= 0 && col < matrix.cols() && matrix(row, col) != 0 && static_cast<int>(round(z)) > matrix(row, col)) {
+            matrix(row, col) = static_cast<int>(round(z));
+        } else if(row > matrix.rows()  || col > matrix.cols()){
+            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: "<< row <<" col: " <<col<<")" << endl;
+        }
+    }
+    file.close();
+}
+
+
+bool check_merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim, int e) {
+    ifstream file(i_filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file!" << endl;
+        return;
+    }
+    int row, col;
+    int n=0;
+    int squared_sum=0;
+    string line;
+    while (getline(file, line)) {
+        istringstream iss(line);
+        double x, y, z;
+        char comma1, comma2;
+        if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
+            cerr << "Invalid line format: " << line << endl;
+            continue;
+        }
+        col = center_point_col + static_cast<int>(floor(x / cell_dim));
+        row = center_point_row - static_cast<int>(floor(y / cell_dim)); 
+
+        if(matrix(row, col) != 0 &&  z != 0) {
+            n+=1;
+            squared_sum+=abs(pow(matrix(row, col),2)-pow(static_cast<int>(round(z)),2));
+        }
+    }
+    file.close();
+    if(squared_sum/n < e){
+        return true;
+    } else {
+        return false;
+    }
+}
