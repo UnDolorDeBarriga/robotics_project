@@ -113,20 +113,20 @@ int main(int argc, char *argv[]) {
             printf("Image %d done.\n", image_n);
         }
     }
+    printf("1");
     MatrixXd big_ass_matrix_combined = create_matrix(maxAbsX, maxAbsY, cell_dim, center_y, center_x);
-
-    
+    printf("2");
     MatrixXd big_ass_matrix1 = big_ass_matrix_combined;
     MatrixXd big_ass_matrix2 = big_ass_matrix_combined;
-    
+    printf("3");
     printf("N Rows: %d\n", big_ass_matrix_combined.rows());
     printf("N Cols: %d\n", big_ass_matrix_combined.cols());
-    
-    return;
+    printf("4");
     vector<MatrixXd> matrices = {big_ass_matrix1, big_ass_matrix2};
     for(int i = 0; i < 1; i++){
         populate_matrix_from_file(filenames[i].c_str(), matrices[i], center_y, center_x, cell_dim);
     }
+    return 0;
 
     printf("N Rows: %d\n", big_ass_matrix_combined.rows());
     printf("N Cols: %d\n", big_ass_matrix_combined.cols());
