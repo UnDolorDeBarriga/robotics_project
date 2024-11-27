@@ -108,7 +108,6 @@ matrix_EXTERNAL_OBJECTS =
 matrix: CMakeFiles/matrix.dir/matrici.cpp.o
 matrix: CMakeFiles/matrix.dir/spatial_transf.cpp.o
 matrix: CMakeFiles/matrix.dir/build.make
-matrix: /usr/local/lib/librealsense2.so.2.55.1
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_stitching.so.4.6.0
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_alphamat.so.4.6.0
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_aruco.so.4.6.0
@@ -145,7 +144,6 @@ matrix: /usr/lib/aarch64-linux-gnu/libopencv_viz.so.4.6.0
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_wechat_qrcode.so.4.6.0
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_xobjdetect.so.4.6.0
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_xphoto.so.4.6.0
-matrix: /usr/local/lib/librsutils.a
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_highgui.so.4.6.0
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_datasets.so.4.6.0
 matrix: /usr/lib/aarch64-linux-gnu/libopencv_plot.so.4.6.0

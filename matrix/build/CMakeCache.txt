@@ -227,9 +227,6 @@ MatrixProcessor_SOURCE_DIR:STATIC=/home/arnau/Desktop/robotics_project/matrix
 //The directory containing a CMake configuration file for OpenCV.
 OpenCV_DIR:PATH=/usr/lib/aarch64-linux-gnu/cmake/opencv4
 
-//The directory containing a CMake configuration file for realsense2.
-realsense2_DIR:PATH=/usr/local/lib/cmake/realsense2
-
 
 ########################
 # INTERNAL cache entries
