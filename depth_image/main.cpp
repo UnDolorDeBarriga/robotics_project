@@ -122,28 +122,21 @@ int main(int argc, char *argv[]) {
             printf("Image %d done.\n", image_n);
         }
     }
+    // Stop the pipeline
+    pipeline.stop();
     
     printf("1");
     
     MatrixXd big_ass_matrix_combined = create_matrix(maxAbsX, maxAbsY, cell_dim, center_y, center_x);
     printf("2");
-    vector<MatrixXd> matrices = {};
-
-    printf("3");
-
-    for(int i = 0; i < n_images; i++){
-        matrices.push_back(MatrixXd::Zero(big_ass_matrix_combined.rows(), big_ass_matrix_combined.cols()));
-        populate_matrix_from_file(filenames[i].c_str(), matrices[i], center_y, center_x, cell_dim);
-        printf("3+ %d",i);
-    }
 
     return 0;
+
+    printf("3");
 
     printf("N Rows: %d\n", big_ass_matrix_combined.rows());
     printf("N Cols: %d\n", big_ass_matrix_combined.cols());
 
 
-    // Stop the pipeline
-    pipeline.stop();
     return 0;
 }

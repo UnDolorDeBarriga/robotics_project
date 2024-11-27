@@ -1,8 +1,6 @@
-
 #include "spatial_transf.hpp"
-#include <iostream>
-#include <Eigen/Dense>
-#include <fstream>
+
+
 
 
 Eigen::Matrix4d RotationMatrix(char axis, double angle) {
@@ -46,7 +44,7 @@ Eigen::Matrix4d TranslationMatrix(double tx, double ty, double tz) {
     return translation;  // Restituisce la matrice di traslazione
 }
 
-void read_txt(const char i_filename[],const char o_filename[],Eigen::Matrix4d M, double& maxAbsX, double& maxAbsY){
+int read_txt(const char i_filename[], const char o_filename[], Eigen::Matrix4d M, double& maxAbsX, double& maxAbsY){
     ifstream myin;
     try {
         myin.open(i_filename);
@@ -55,11 +53,12 @@ void read_txt(const char i_filename[],const char o_filename[],Eigen::Matrix4d M,
         }
     } catch (const std::ios_base::failure& e) {
         cerr << e.what() << endl;
-        return;
+        return -1;
     }
     ofstream myout;
     myout.open(o_filename);
     string line;
+    int n_lines = 0;
     while (getline(myin, line)) {
         std::stringstream ss(line);  // Utilizziamo un stringstream per separare i valori
         std::string temp;
@@ -81,31 +80,23 @@ void read_txt(const char i_filename[],const char o_filename[],Eigen::Matrix4d M,
         if(std::abs(vec(1)) > maxAbsY){
             maxAbsY = std::abs(vec(1));
         }
+        n_lines++;
     }
     myin.close();
     myout.close();
-    return;
+    return n_lines;
 }
 
-
-
-MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col) {
-    int num_rows = ceil((2 * maxAbsY) / cell_dim);
-    int num_cols = ceil((2 * maxAbsX) / cell_dim);
-    MatrixXd z_matrix = MatrixXd::Zero(num_rows+1, num_cols+1);
-
-    // Determine the center point in the matrix (corresponding to x = 0, y = 0)
-    center_point_row = num_rows / 2;
-    center_point_col = num_cols / 2;
-    return z_matrix;
-}
-
-void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim) {
+void populate_matrix_from_file(const char i_filename[], SparseMatrix<int>& matrix, int center_point_row, int center_point_col, int cell_dim, int n_lines) {
     ifstream file(i_filename);
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
         return;
     }
+
+    // Reserve space for non-zero elements
+    matrix.reserve(n_lines);
+
     int row, col;
     string line;
     while (getline(file, line)) {
@@ -119,15 +110,21 @@ void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int ce
 
         col = center_point_col + static_cast<int>(floor(x / cell_dim));
         row = center_point_row - static_cast<int>(floor(y / cell_dim));
- 
 
         if (row >= 0 && row < matrix.rows() && col >= 0 && col < matrix.cols()) {
-            matrix(row, col) = static_cast<int>(round(z)); // Assign the z value to the appropriate cell
+            int z_value = static_cast<int>(round(z));
+            if (matrix.coeff(row, col) == 0) {
+                matrix.insert(row, col) = z_value;
+            } else if (matrix.coeff(row, col) < z_value) {
+                matrix.coeffRef(row, col) = z_value;
+            }
         } else {
-            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: "<< row <<" col: " <<col<<")" << endl;
+            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: " << row << " col: " << col << ")" << endl;
         }
     }
     file.close();
+    matrix.makeCompressed();
+    return;
 }
 
 void merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim) {
@@ -164,7 +161,7 @@ void merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int cente
 }
 
 
-bool check_merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim, int e) {
+bool check_merge_matrix_with_file(const char i_filename[], SparseMatrix<int>& matrix, int center_point_row, int center_point_col, int cell_dim, int e) {
     ifstream file(i_filename);
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
@@ -177,17 +174,22 @@ bool check_merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int
     while (getline(file, line)) {
         istringstream iss(line);
         double x, y, z;
+        int temp_value;
         char comma1, comma2;
         if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
             cerr << "Invalid line format: " << line << endl;
             continue;
         }
         col = center_point_col + static_cast<int>(floor(x / cell_dim));
-        row = center_point_row - static_cast<int>(floor(y / cell_dim)); 
-
-        if(matrix(row, col) != 0 &&  z != 0) {
-            n+=1;
-            squared_sum+=abs(pow(matrix(row, col),2)-pow(static_cast<int>(round(z)),2));
+        row = center_point_row - static_cast<int>(floor(y / cell_dim));
+ 
+        if((row <= matrix.rows() || col <= matrix.cols()) && (row >= 0 && col >= 0)){
+            temp_value = matrix.coeff(row, col);
+            if(temp_value != 0 &&  z != 0) {
+                n+=1;
+                squared_sum += std::abs(std::pow(temp_value,2) - std::pow(static_cast<int>(round(z)),2));
+                cout << "temp_value: " << temp_value << " z: " << z << " super z: " << static_cast<int>(round(z)) << endl;
+            }   
         }
     }
     file.close();
