@@ -8,12 +8,13 @@
 // Main function
 int main(int argc, char *argv[]) {
     if (argc != 4) {
-        printf("Usage: %s <maximum distance(m)> <number of frames> <cell discretization(mm)>\n", argv[0]);
+        printf("Usage: %s <number of images that are going to be computed> <maximum distance(m)> <number of frames> <cell discretization(mm)>\n", argv[0]);
         return EXIT_FAILURE;
     }
-    int max_dist = atoi(argv[1]);
-    int n_index = atoi(argv[2]);
-    int cell_dim = atoi(argv[3]);
+    int n_images = atoi(argv[1]);
+    int max_dist = atoi(argv[2]);
+    int n_index = atoi(argv[3]);
+    int cell_dim = atoi(argv[4]);
     int max_depth = max_dist * 1000;  // Convert max distance to millimeters
 
     double maxAbsX=0;
@@ -41,7 +42,7 @@ int main(int argc, char *argv[]) {
     // Get depth intrinsics
     rs2_intrinsics intrinsics;
     
-    for (int image_n = 0; image_n < N_IMAGES; image_n++) {
+    for (int image_n = 0; image_n < n_images; image_n++) {
         // Reinitialize OpenCV matrices to accumulate depth data
         Mat accumulated_depth = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         Mat valid_pixel_count = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
@@ -106,26 +107,21 @@ int main(int argc, char *argv[]) {
         transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY);
 
         // Wait for a keyboard input
-        if (image_n != N_IMAGES-1) {
+        if (image_n != n_images-1) {
             printf("Image %d done.\nPress any key to continue...\n", image_n);
             getchar();
         } else {
             printf("Image %d done.\n", image_n);
         }
     }
-    printf("1");
+    
     MatrixXd big_ass_matrix_combined = create_matrix(maxAbsX, maxAbsY, cell_dim, center_y, center_x);
-    printf("2");
-    MatrixXd big_ass_matrix1 = big_ass_matrix_combined;
-    MatrixXd big_ass_matrix2 = big_ass_matrix_combined;
-    printf("3");
-    printf("N Rows: %d\n", big_ass_matrix_combined.rows());
-    printf("N Cols: %d\n", big_ass_matrix_combined.cols());
-    printf("4");
-    vector<MatrixXd> matrices = {big_ass_matrix1, big_ass_matrix2};
-    for(int i = 0; i < 1; i++){
+    vector<MatrixXd> matrices = {};
+    for(int i = 0; i < n_images; i++){
+        matrices.push_back(MatrixXd::Zero(big_ass_matrix_combined.rows(), big_ass_matrix_combined.cols()));
         populate_matrix_from_file(filenames[i].c_str(), matrices[i], center_y, center_x, cell_dim);
     }
+
     return 0;
 
     printf("N Rows: %d\n", big_ass_matrix_combined.rows());

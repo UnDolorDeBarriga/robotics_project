@@ -13,7 +13,6 @@
 #define WIDTH 640
 #define HEIGHT 480
 #define FPS 30
-#define N_IMAGES 2
 
 using namespace Eigen;
 using namespace std;
