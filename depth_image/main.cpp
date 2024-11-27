@@ -7,7 +7,7 @@
 
 // Main function
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
+    if (argc != 5) {
         printf("Usage: %s <number of images that are going to be computed> <maximum distance(m)> <number of frames> <cell discretization(mm)>\n", argv[0]);
         return EXIT_FAILURE;
     }
@@ -77,6 +77,8 @@ int main(int argc, char *argv[]) {
             accumulated_depth += depth_data;
         }
 
+        printf("Accumulated depth data for image %d\n", image_n);
+
         char i_filename[100];
         sprintf(i_filename, "../data/camera_points_image%d.txt", image_n);
         char o_filename[100];
@@ -85,15 +87,19 @@ int main(int argc, char *argv[]) {
     
         // Compute the mean depth image
         get_mean_depth(accumulated_depth, valid_pixel_count);
+        printf("Computed mean depth for image %d\n", image_n);
         
         // Write the depth data to a CSV file
         write_depth_to_csv(accumulated_depth, n_index, image_n);
+        printf("Wrote depth data to CSV for image %d\n", image_n);
         
         // Deproject the mean depth image into 3D points
         auto points_image = deproject_depth_to_3d(i_filename, accumulated_depth, intrinsics, image_n);
+        printf("Deprojected depth to 3D for image %d\n", image_n);
 
         // Write the mean depth image to a PNG file
         write_depth_to_image(accumulated_depth, max_depth, n_index, image_n);
+        printf("Wrote depth image to PNG for image %d\n", image_n);
         
         // Get the user points for the camera position and angle
         Vector3f camera_position;
@@ -103,8 +109,10 @@ int main(int argc, char *argv[]) {
         camera_angle = Vector3f(0.0, 0.0, 0.0);
 
         Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
+        printf("Created transformation matrix for image %d\n", image_n);
 
         transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY);
+        printf("Transformed coordinates for image %d\n", image_n);
 
         // Wait for a keyboard input
         if (image_n != n_images-1) {
@@ -115,18 +123,24 @@ int main(int argc, char *argv[]) {
         }
     }
     
+    printf("1");
+    
     MatrixXd big_ass_matrix_combined = create_matrix(maxAbsX, maxAbsY, cell_dim, center_y, center_x);
+    printf("2");
     vector<MatrixXd> matrices = {};
+
+    printf("3");
+
     for(int i = 0; i < n_images; i++){
         matrices.push_back(MatrixXd::Zero(big_ass_matrix_combined.rows(), big_ass_matrix_combined.cols()));
         populate_matrix_from_file(filenames[i].c_str(), matrices[i], center_y, center_x, cell_dim);
+        printf("3+ %d",i);
     }
 
     return 0;
 
     printf("N Rows: %d\n", big_ass_matrix_combined.rows());
     printf("N Cols: %d\n", big_ass_matrix_combined.cols());
-    //cout << matrices[0];
 
 
     // Stop the pipeline

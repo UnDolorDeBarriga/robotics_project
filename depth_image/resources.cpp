@@ -347,3 +347,39 @@ void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int ce
     }
     file.close();
 }
+
+/**
+ * @brief Combines multiple matrices into a single matrix by averaging overlapping cells.
+ * 
+ * @param matrices A vector of matrices to be combined.
+ * @return MatrixXd The combined matrix.
+ */
+MatrixXd combine_matrices(const vector<MatrixXd>& matrices) {
+    if (matrices.empty()) {
+        return MatrixXd();
+    }
+
+    MatrixXd combined_matrix = MatrixXd::Zero(matrices[0].rows(), matrices[0].cols());
+    MatrixXd count_matrix = MatrixXd::Zero(matrices[0].rows(), matrices[0].cols());
+
+    for (const auto& matrix : matrices) {
+        for (int i = 0; i < matrix.rows(); ++i) {
+            for (int j = 0; j < matrix.cols(); ++j) {
+                if (matrix(i, j) != 0) {
+                    combined_matrix(i, j) += matrix(i, j);
+                    count_matrix(i, j) += 1;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < combined_matrix.rows(); ++i) {
+        for (int j = 0; j < combined_matrix.cols(); ++j) {
+            if (count_matrix(i, j) > 0) {
+                combined_matrix(i, j) /= count_matrix(i, j);
+            }
+        }
+    }
+
+    return combined_matrix;
+}

@@ -34,13 +34,20 @@ int main(){
     // Matrice di trasformazione spaziale
     Eigen::Matrix4d M = T * Rx * Ry *Rz ;
     read_txt("../camera_points_image0.txt","../reference_points_image0.txt",M, maxAbsX, maxAbsY);
+    read_txt("../camera_points_image1.txt","../reference_points_image1.txt",M, maxAbsX, maxAbsY);
 
     MatrixXd big_ass_matrix_combined = create_matrix(maxAbsX, maxAbsY, 1, center_y, center_x);
 
+    int e = 20;
     
-    MatrixXd big_ass_matrix1 = big_ass_matrix_combined;
-    MatrixXd big_ass_matrix2 = big_ass_matrix_combined;
+    populate_matrix_from_file("../reference_points_image0.txt", big_ass_matrix_combined, center_y, center_x, 1);
+    
+    if (check_merge_matrix_with_file("../reference_points_image1.txt", big_ass_matrix_combined, center_y, center_x, 1, e)) {
+        merge_matrix_with_file("../reference_points_image1.txt", big_ass_matrix_combined, center_y, center_x, 1);   
+    }
+    else {
+        printf("JAJA PRimo\n");
+    }
 
-    printf("hehahe");
-    populate_matrix_from_file("../reference_points_image0.txt", big_ass_matrix1, center_y, center_x, 1);
+
 }

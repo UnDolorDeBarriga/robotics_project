@@ -168,7 +168,7 @@ bool check_merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int
     ifstream file(i_filename);
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
-        return;
+        return false;
     }
     int row, col;
     int n=0;
@@ -191,6 +191,8 @@ bool check_merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int
         }
     }
     file.close();
+    printf("n: %d\n",n);
+    printf("squared_sum: %d\n",squared_sum);
     if(squared_sum/n < e){
         return true;
     } else {
