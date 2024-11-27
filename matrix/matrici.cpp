@@ -23,7 +23,7 @@ int main(){
     int center_x;
     int center_y;
 
-    int dim = 1;
+    int dim = 10;
     int n_lines1, n_lines2;
     double maxAbsX=0;
     double maxAbsY=0;
@@ -52,6 +52,30 @@ int main(){
     int e = 20;
     populate_matrix_from_file("../data/reference_points_image0.txt", big_matrix1, center_y, center_x, dim, n_lines1);
     populate_matrix_from_file("../data/reference_points_image1.txt", big_matrix2, center_y, center_x, dim, n_lines2);
+
+    if (check_matrix(big_matrix1, big_matrix2, e)) {
+        printf("4");
+        merge_matrix(big_ass_matrix_combined, big_matrix1, big_matrix2);
+
+        std::ofstream output_file("big_ass_matrix_combined.csv");
+        for (int i = 0; i < big_ass_matrix_combined.rows(); ++i) {
+            for (int j = 0; j < big_ass_matrix_combined.cols(); ++j) {
+                output_file << big_ass_matrix_combined.coeff(i, j);
+                if (j < big_ass_matrix_combined.cols() - 1) {
+                    output_file << ",";
+                }
+            }
+            output_file << "\n";
+        }
+        output_file.close();
+    }
+    else {
+        printf("5");
+        printf("JAJA PRimo\n");
+    }
+
+
+#if False
     if (check_merge_matrix_with_file("../data/reference_points_image1.txt", big_ass_matrix_combined, center_y, center_x, dim, e)) {
         printf("4");
         //merge_matrix_with_file("../data/reference_points_image1.txt", big_ass_matrix_combined, center_y, center_x, 1);   
@@ -60,6 +84,6 @@ int main(){
         printf("5");
         printf("JAJA PRimo\n");
     }
-
+#endif
     return 0;
 }

@@ -201,3 +201,41 @@ bool check_merge_matrix_with_file(const char i_filename[], SparseMatrix<int>& ma
         return false;
     }
 }
+
+
+bool check_matrix(SparseMatrix<int>& matrix1, SparseMatrix<int>& matrix2, int e) {
+    int n=0;
+    int squared_sum=0;
+    for (int i = 0; i < matrix1.rows(); i++) {
+        for (int j = 0; j < matrix1.cols(); j++) {
+            int temp_value1 = matrix1.coeff(i, j);
+            int temp_value2 = matrix2.coeff(i, j);
+            if(temp_value1 != 0 && temp_value2 != 0) {
+                n+=1;
+                squared_sum += std::abs(std::pow(temp_value1,2) - std::pow(temp_value2,2));
+            }
+        }
+    }
+    if(squared_sum/n < e){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+void merge_matrix(SparseMatrix<int>& big_matrix, SparseMatrix<int>& matrix1, SparseMatrix<int>& matrix2) {
+    for (int i = 0; i < big_matrix.rows(); i++) {
+        for (int j = 0; j < big_matrix.cols(); j++) {
+            int temp_value1 = matrix1.coeff(i, j);
+            int temp_value2 = matrix2.coeff(i, j);
+            if(temp_value1 != 0 || temp_value2 != 0) {
+                if (temp_value1 > temp_value2) {
+                    big_matrix.insert(i, j) = temp_value1;
+                } else {
+                    big_matrix.insert(i, j) = temp_value2;
+                }
+            }
+        }
+    }
+}

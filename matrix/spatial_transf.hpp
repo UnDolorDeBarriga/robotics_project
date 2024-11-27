@@ -18,5 +18,7 @@ bool check_merge_matrix_with_file(const char i_filename[], SparseMatrix<int>& ma
 void merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim);   
 
 
+bool check_matrix(SparseMatrix<int>& matrix1, SparseMatrix<int>& matrix2, int e);
+void merge_matrix(SparseMatrix<int>& big_matrix, SparseMatrix<int>& matrix1, SparseMatrix<int>& matrix2);
 
 #endif

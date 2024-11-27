@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     int max_dist = atoi(argv[2]);
     int n_index = atoi(argv[3]);
     int cell_dim = atoi(argv[4]);
-    int max_depth = max_dist * 1000;  // Convert max distance to millimeters
+    float max_depth = max_dist * 1000;  // Convert max distance to millimeters
 
     double maxAbsX=0;
     double maxAbsY=0;
@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < WIDTH; i++){
                 for (int j = 0; j < HEIGHT; j++){
                     float depth = depth_frame.get_distance(i, j);
-                    if (depth >= 0) {
-                        if (depth >= max_depth) {
+                    if (depth >= 1) {
+                        if (depth >= max_dist) {
                             depth_data.at<float>(j, i) = max_depth;
                         }
                         else {
@@ -86,32 +86,34 @@ int main(int argc, char *argv[]) {
         filenames.push_back(o_filename);
     
         // Compute the mean depth image
-        get_mean_depth(accumulated_depth, valid_pixel_count);
+        Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count, max_depth);
         printf("Computed mean depth for image %d\n", image_n);
         
         // Write the depth data to a CSV file
-        write_depth_to_csv(accumulated_depth, n_index, image_n);
+        write_depth_to_csv(average_depth, n_index, image_n);
         printf("Wrote depth data to CSV for image %d\n", image_n);
         
         // Deproject the mean depth image into 3D points
-        auto points_image = deproject_depth_to_3d(i_filename, accumulated_depth, intrinsics, image_n);
+        auto points_image = deproject_depth_to_3d(i_filename, average_depth, intrinsics, image_n);
         printf("Deprojected depth to 3D for image %d\n", image_n);
 
         // Write the mean depth image to a PNG file
-        write_depth_to_image(accumulated_depth, max_depth, n_index, image_n);
+        write_depth_to_image(average_depth, max_depth, n_index, image_n);
         printf("Wrote depth image to PNG for image %d\n", image_n);
         
         // Get the user points for the camera position and angle
         Vector3f camera_position;
         Vector3f camera_angle;
+        
+        //TODO: Read the user points from a file every time
         //get_user_points(image_n, camera_position, camera_angle);
         camera_position = Vector3f(0.0, 0.0, 0.0);
-        camera_angle = Vector3f(0.0, 0.0, 0.0);
+        camera_angle = Vector3f(-90.0, 0.0, 0.0);
 
         Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
         printf("Created transformation matrix for image %d\n", image_n);
 
-        transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY);
+        transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY, camera_position, camera_angle);
         printf("Transformed coordinates for image %d\n", image_n);
 
         // Wait for a keyboard input

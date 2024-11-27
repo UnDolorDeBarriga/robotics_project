@@ -63,15 +63,18 @@ vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix
  * @param accumulated_depth The depth matrix to be averages.
  * @param valid_pixel_count The matrix of number of valid pixels.
  */
-void get_mean_depth(Mat &accumulated_depth, Mat valid_pixel_count) {
-    for (int y = 0; y < HEIGHT; ++y) {
-        for (int x = 0; x < WIDTH; ++x) {
+Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count, float max_dist) {
+    Mat average_depth = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
+    for (int x = 0; x < accumulated_depth.cols; ++x) {
+        for (int y = 0; y < accumulated_depth.rows; ++y) {
             if (valid_pixel_count.at<int>(y, x) > 0) {
-                accumulated_depth.at<float>(y, x) /= valid_pixel_count.at<int>(y, x);
+                // float mean_value = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
+                // average_depth.at<float>(y, x) = std::min(mean_value, max_dist);
+                average_depth.at<float>(y, x) = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
             }
         }
     }
-    return;
+    return average_depth;
 }
 
 /**
@@ -215,7 +218,7 @@ Matrix4d translation_matrix(double tx, double ty, double tz) {
  * 
  * @throws ios_base::failure If the input file cannot be opened.
  */
-void transformate_cordinates(const char i_filename[],const char o_filename[], Matrix4d M, double& maxAbsX, double& maxAbsY) {
+void transformate_cordinates(const char i_filename[],const char o_filename[], Matrix4d M, double& maxAbsX, double& maxAbsY,  Vector3f camera_position, Vector3f camera_angle) {
     ifstream myin;
     try {
         myin.open(i_filename);
@@ -228,6 +231,8 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
     }
     ofstream myout;
     myout.open(o_filename);
+    myout << camera_position(0) << "," << camera_position(1) << "," << camera_position(2) << endl;
+    myout << camera_angle(0) << "," << camera_angle(1) << "," << camera_angle(2) << endl;
     string line;
     while (getline(myin, line)) {
         stringstream ss(line);  
