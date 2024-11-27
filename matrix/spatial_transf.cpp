@@ -46,7 +46,7 @@ Eigen::Matrix4d TranslationMatrix(double tx, double ty, double tz) {
     return translation;  // Restituisce la matrice di traslazione
 }
 
-void read_txt(const char i_filename[],const char o_filename[],Eigen::Matrix4d M){
+void read_txt(const char i_filename[],const char o_filename[],Eigen::Matrix4d M, double& maxAbsX, double& maxAbsY){
     ifstream myin;
     try {
         myin.open(i_filename);
@@ -75,9 +75,16 @@ void read_txt(const char i_filename[],const char o_filename[],Eigen::Matrix4d M)
         vec(2) = std::stod(temp);  // Assegna il terzo valore al vettore (z)
         vec=M*vec;
         myout << vec(0) << "," << vec(1) << "," << vec(2) << endl;
+        if(std::abs(vec(0))>maxAbsX){
+            maxAbsX = std::abs(vec(0));
+        }
+        if(std::abs(vec(1)) > maxAbsY){
+            maxAbsY = std::abs(vec(1));
+        }
     }
     myin.close();
     myout.close();
+    return;
 }
 
 
@@ -91,4 +98,34 @@ MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center
     center_point_row = num_rows / 2;
     center_point_col = num_cols / 2;
     return z_matrix;
+}
+
+void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim) {
+    ifstream file(i_filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file!" << endl;
+        return;
+    }
+    int row, col;
+    string line;
+    while (getline(file, line)) {
+        istringstream iss(line);
+        double x, y, z;
+        char comma1, comma2;
+        if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
+            cerr << "Invalid line format: " << line << endl;
+            continue;
+        }
+
+        col = center_point_col + static_cast<int>(floor(x / cell_dim));
+        row = center_point_row - static_cast<int>(floor(y / cell_dim));
+ 
+
+        if (row >= 0 && row < matrix.rows() && col >= 0 && col < matrix.cols()) {
+            matrix(row, col) = static_cast<int>(round(z)); // Assign the z value to the appropriate cell
+        } else {
+            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: "<< row <<" col: " <<col<<")" << endl;
+        }
+    }
+    file.close();
 }
