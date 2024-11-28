@@ -1,6 +1,115 @@
 #include "resources.h"
 #include <fstream>
 
+
+
+/**
+ * @brief Captures depth frames and accumulates depth data.
+ * 
+ * This function captures a specified number of depth frames from a RealSense pipeline,
+ * normalizes the depth values, and accumulates the depth data. It also counts the number
+ * of valid depth measurements for each pixel.
+ * 
+ * @param pipeline The RealSense pipeline to capture frames from.
+ * @param n_index The number of frames to capture.
+ * @param accumulated_depth A matrix to accumulate the depth values.
+ * @param valid_pixel_count A matrix to count the number of valid depth measurements for each pixel.
+ * @param max_dist The maximum distance to consider for depth measurements (in meters).
+ * @return rs2_intrinsics The camera intrinsics of the captured frames.
+ */
+rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumulated_depth, Mat &valid_pixel_count, int max_dist) {
+    rs2_intrinsics intrinsics;
+    for (int frame_count = 0; frame_count < n_index; ++frame_count) {
+        // Wait for the next set of frames
+        frameset frames = pipeline.wait_for_frames();
+        depth_frame depth_frame = frames.get_depth_frame();
+        intrinsics = depth_frame.get_profile().as<video_stream_profile>().get_intrinsics();
+
+        Mat depth_data = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
+        // Normalize depth values to max distance (in millimeters)
+        for (int i = 0; i < WIDTH; i++){
+            for (int j = 0; j < HEIGHT; j++){
+                float depth = depth_frame.get_distance(i, j);
+                if (depth >= MIN_DIST) {
+                    if (depth >= max_dist) {
+                        depth_data.at<float>(j, i) = (max_dist*1000);
+                    }
+                    else {
+                        depth_data.at<float>(j, i) = depth * 1000;  // Convert depth to millimeters
+                    }
+                    valid_pixel_count.at<int>(j, i) += 1;
+                }
+                else {
+                    depth_data.at<float>(j, i) = 0;  // Set out-of-range depth to 0
+                }
+            }
+        }
+        // Accumulate depth data
+        accumulated_depth += depth_data;
+    }
+    return intrinsics;
+}
+
+
+
+/**
+ * @brief Writes depth data to files and performs transformation.
+ *
+ * This function processes depth data by computing the mean depth image, writing it to a CSV file,
+ * deprojecting it into 3D points, and writing the depth image to a PNG file. It also creates a 
+ * transformation matrix based on camera position and angle, and transforms coordinates accordingly.
+ *
+ * @param n_index Index of the current dataset.
+ * @param image_n Index of the current image.
+ * @param i_filename Input filename for depth data.
+ * @param o_filename Output filename for transformed coordinates.
+ * @param accumulated_depth Accumulated depth data.
+ * @param valid_pixel_count Count of valid pixels in the depth data.
+ * @param intrinsics Camera intrinsics for depth deprojection.
+ * @param max_dist Maximum distance for depth values.
+ * @param maxAbsX Maximum absolute X coordinate for transformation.
+ * @param maxAbsY Maximum absolute Y coordinate for transformation.
+ */
+void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int max_dist, double maxAbsX, double maxAbsY) {
+
+    // Compute the mean depth image
+    Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count);
+    printf("Computed mean depth for image %d\n", image_n);
+    
+    // Write the depth data to a CSV file
+    write_depth_to_csv(average_depth, n_index, image_n);
+    printf("Wrote depth data to CSV for image %d\n", image_n);
+    
+    // Deproject the mean depth image into 3D points
+    auto points_image = deproject_depth_to_3d(i_filename, average_depth, intrinsics, image_n);
+    printf("Deprojected depth to 3D for image %d\n", image_n);
+
+    // Write the mean depth image to a PNG file
+    write_depth_to_image(average_depth, (max_dist*1000), n_index, image_n);
+    printf("Wrote depth image to PNG for image %d\n", image_n);
+    
+    // Get the user points for the camera position and angle
+    Vector3f camera_position;
+    Vector3f camera_angle;
+    
+    //TODO: Read the user points from a file every time
+    //get_user_points(image_n, camera_position, camera_angle);
+    camera_position = Vector3f(0.0, 0.0, 0.0);
+    camera_angle = Vector3f(-90.0, 0.0, 0.0);
+
+    Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
+    printf("Created transformation matrix for image %d\n", image_n);
+
+    transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY, camera_position, camera_angle);
+    printf("Transformed coordinates for image %d\n", image_n);
+
+    return;
+}
+
+
+
+
+
 /**
  * @brief Writes the depth matrix data to a CSV file.
  * 
@@ -57,19 +166,22 @@ vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix
     return points;
 }
 
+
 /**
- * @brief Computes the mean depth image.
- * 
- * @param accumulated_depth The depth matrix to be averages.
- * @param valid_pixel_count The matrix of number of valid pixels.
+ * @brief Computes the mean depth for each pixel from accumulated depth values and valid pixel counts.
+ *
+ * This function calculates the average depth for each pixel by dividing the accumulated depth values
+ * by the corresponding valid pixel counts. If a pixel has no valid counts, its average depth remains zero.
+ *
+ * @param accumulated_depth A matrix of accumulated depth values for each pixel (CV_32FC1).
+ * @param valid_pixel_count A matrix of valid pixel counts for each pixel (CV_32SC1).
+ * @return A matrix of average depth values for each pixel (CV_32FC1).
  */
-Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count, float max_dist) {
+Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count) {
     Mat average_depth = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
     for (int x = 0; x < accumulated_depth.cols; ++x) {
         for (int y = 0; y < accumulated_depth.rows; ++y) {
             if (valid_pixel_count.at<int>(y, x) > 0) {
-                // float mean_value = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
-                // average_depth.at<float>(y, x) = std::min(mean_value, max_dist);
                 average_depth.at<float>(y, x) = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
             }
         }
