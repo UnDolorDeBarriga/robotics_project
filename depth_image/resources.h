@@ -27,7 +27,8 @@ void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n);
 vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n);
 Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count);
 void write_depth_to_image(Mat depth_matrix, int max_depth, int n_index, int image_n);
-void get_user_points(int image_n, Vector3f &camera_position, Vector3f &camera_angle);
+void get_user_points_input(int image_n, Vector3f &camera_position, Vector3f &camera_angle);
+void get_user_points_file(const char pos_filename[], int image_n, Vector3f &camera_position, Vector3f &camera_angle);
 
 Matrix4d rotation_matrix(int axis, double angle);
 Matrix4d translation_matrix(double tx, double ty, double tz);

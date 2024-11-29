@@ -50,8 +50,6 @@ rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumu
     return intrinsics;
 }
 
-
-
 /**
  * @brief Writes depth data to files and performs transformation.
  *
@@ -92,10 +90,19 @@ void write_data_to_files(int n_index, int image_n, const char i_filename[], cons
     Vector3f camera_position;
     Vector3f camera_angle;
     
-    //TODO: Read the user points from a file every time
-    //get_user_points(image_n, camera_position, camera_angle);
-    camera_position = Vector3f(0.0, 0.0, 0.0);
-    camera_angle = Vector3f(-90.0, 0.0, 0.0);
+
+    //TODO: Put that pos filename is a var defined in main and pass it as a parameter
+    //get_user_points_input(image_n, camera_position, camera_angle);
+    char pos_filename[100];
+    sprintf(pos_filename, "../position_camera.txt");
+    get_user_points_file(pos_filename, image_n, camera_position, camera_angle);
+    //camera_position = Vector3f(0.0, 0.0, 0.0);
+    //camera_angle = Vector3f(0.0, 0.0, 0.0);
+    cout << camera_position.transpose() << endl;
+    cout << camera_angle.transpose() << endl;
+
+    return ;
+
 
     Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
     printf("Created transformation matrix for image %d\n", image_n);
@@ -106,9 +113,27 @@ void write_data_to_files(int n_index, int image_n, const char i_filename[], cons
     return;
 }
 
-
-
-
+/**
+ * @brief Computes the mean depth for each pixel from accumulated depth values and valid pixel counts.
+ *
+ * This function calculates the average depth for each pixel by dividing the accumulated depth values
+ * by the corresponding valid pixel counts. If a pixel has no valid counts, its average depth remains zero.
+ *
+ * @param accumulated_depth A matrix of accumulated depth values for each pixel (CV_32FC1).
+ * @param valid_pixel_count A matrix of valid pixel counts for each pixel (CV_32SC1).
+ * @return A matrix of average depth values for each pixel (CV_32FC1).
+ */
+Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count) {
+    Mat average_depth = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
+    for (int x = 0; x < accumulated_depth.cols; ++x) {
+        for (int y = 0; y < accumulated_depth.rows; ++y) {
+            if (valid_pixel_count.at<int>(y, x) > 0) {
+                average_depth.at<float>(y, x) = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
+            }
+        }
+    }
+    return average_depth;
+}
 
 /**
  * @brief Writes the depth matrix data to a CSV file.
@@ -167,27 +192,6 @@ vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix
 }
 
 
-/**
- * @brief Computes the mean depth for each pixel from accumulated depth values and valid pixel counts.
- *
- * This function calculates the average depth for each pixel by dividing the accumulated depth values
- * by the corresponding valid pixel counts. If a pixel has no valid counts, its average depth remains zero.
- *
- * @param accumulated_depth A matrix of accumulated depth values for each pixel (CV_32FC1).
- * @param valid_pixel_count A matrix of valid pixel counts for each pixel (CV_32SC1).
- * @return A matrix of average depth values for each pixel (CV_32FC1).
- */
-Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count) {
-    Mat average_depth = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
-    for (int x = 0; x < accumulated_depth.cols; ++x) {
-        for (int y = 0; y < accumulated_depth.rows; ++y) {
-            if (valid_pixel_count.at<int>(y, x) > 0) {
-                average_depth.at<float>(y, x) = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
-            }
-        }
-    }
-    return average_depth;
-}
 
 /**
  * @brief Writes the depth_matrix data to an image file.
@@ -215,7 +219,7 @@ void write_depth_to_image(Mat depth_matrix, int max_depth, int n_index, int imag
  * @param camera_position Pointer to the camera position.
  * @param camera_angle Pointer to the camera angle.
  */
-void get_user_points(int image_n, Vector3f &camera_position, Vector3f &camera_angle) {
+void get_user_points_input(int image_n, Vector3f &camera_position, Vector3f &camera_angle) {
     vector<Eigen::Vector3f> user_points;
     for (int i = 0; i < 2; ++i) {
         while (true) {
@@ -257,6 +261,37 @@ void get_user_points(int image_n, Vector3f &camera_position, Vector3f &camera_an
     cout << camera_angle.transpose() << "\n";
     return;
 }
+
+
+
+
+void get_user_points_file(const char pos_filename[], int image_n, Vector3f &camera_position, Vector3f &camera_angle) {
+    ifstream file(pos_filename);
+    if (!file.is_open()) {
+        cerr << "Error opening position file!" << endl;
+        return;
+    }
+
+    string line;
+    getline(file, line);
+    stringstream ss_position(line);
+    ss_position >> camera_position(0);
+    ss_position.ignore(1); // Ignore the comma
+    ss_position >> camera_position(1);
+    ss_position.ignore(1); // Ignore the comma
+    ss_position >> camera_position(2);
+
+    getline(file, line);
+    stringstream ss_angle(line);
+    ss_angle >> camera_angle(0);
+    ss_angle.ignore(1); // Ignore the comma
+    ss_angle >> camera_angle(1);
+    ss_angle.ignore(1); // Ignore the comma
+    ss_angle >> camera_angle(2);
+    file.close();
+}
+
+
 
 /**
  * @brief Generates a 4x4 rotation matrix for a given axis and angle.
@@ -384,7 +419,7 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
  * @return Eigen::Matrix4d The resulting 4x4 transformation matrix.
  */
 Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_angle){
-    Matrix4d Rx = rotation_matrix(1, camera_angle[0]);
+    Matrix4d Rx = rotation_matrix(1, -90 + camera_angle[0]);
     Matrix4d Ry = rotation_matrix(2, camera_angle[1]);
     Matrix4d Rz = rotation_matrix(3, camera_angle[2]);
 
