@@ -28,24 +28,24 @@ int main(){
     double maxAbsX=0;
     double maxAbsY=0;
     
-    Eigen::Matrix4d Rx = RotationMatrix(1, 0);  // Rotazione attorno all'asse X
+    Eigen::Matrix4d Rx = RotationMatrix(1, -90);  // Rotazione attorno all'asse X
     Eigen::Matrix4d Ry = RotationMatrix(2, 0);  // Rotazione attorno all'asse Y
     Eigen::Matrix4d Rz = RotationMatrix(3, 0);  // Rotazione attorno all'asse Z
     // Matrice di traslazione
-    Eigen::Matrix4d T= TranslationMatrix(0, 0, 1000);  // Traslazione (1, 2, 3)
+    Eigen::Matrix4d T= TranslationMatrix(0, 0, 0);  // Traslazione (1, 2, 3)
     // Matrice di trasformazione spaziale
     Eigen::Matrix4d M = T * Rx * Ry *Rz ;
 
     n_lines1 = read_txt("../data/camera_points_image0.txt","../data/reference_points_image0.txt",M, maxAbsX, maxAbsY);
     n_lines2 = read_txt("../data/camera_points_image1.txt","../data/reference_points_image1.txt",M, maxAbsX, maxAbsY);
     
-    int num_rows = std::ceil((2 * maxAbsY) / dim);
+    int num_rows = std::ceil((maxAbsY) / dim);
     int num_cols = std::ceil((2 * maxAbsX) / dim);
     
-    SparseMatrix<int> big_ass_matrix_combined(num_rows+1, num_cols+1);
-    SparseMatrix<int> big_matrix1(num_rows+1, num_cols+1);
-    SparseMatrix<int> big_matrix2(num_rows+1, num_cols+1);
-    center_y = num_rows / 2;
+    SparseMatrix<int> big_ass_matrix_combined(num_rows, num_cols+1);
+    SparseMatrix<int> big_matrix1(num_rows, num_cols+1);
+    SparseMatrix<int> big_matrix2(num_rows, num_cols+1);
+    center_y = num_rows;
     center_x = num_cols / 2;
 
 
