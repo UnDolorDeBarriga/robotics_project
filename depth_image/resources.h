@@ -9,7 +9,7 @@
 #include <Eigen/Dense>
 #include <fstream>
 
-#define MIN_DIST 2.0f 
+#define MIN_DIST 0.0f 
 #define WIDTH 640
 #define HEIGHT 480
 #define FPS 30

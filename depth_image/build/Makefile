@@ -129,6 +129,56 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+#=============================================================================
+# Target rules for targets named calibration
+
+# Build rule for target.
+calibration: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 calibration
+.PHONY : calibration
+
+# fast build rule for target.
+calibration/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/build
+.PHONY : calibration/fast
+
+#=============================================================================
+# Target rules for targets named build_all
+
+# Build rule for target.
+build_all: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 build_all
+.PHONY : build_all
+
+# fast build rule for target.
+build_all/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_all.dir/build.make CMakeFiles/build_all.dir/build
+.PHONY : build_all/fast
+
+calibration.o: calibration.cpp.o
+.PHONY : calibration.o
+
+# target to build an object file
+calibration.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/calibration.cpp.o
+.PHONY : calibration.cpp.o
+
+calibration.i: calibration.cpp.i
+.PHONY : calibration.i
+
+# target to preprocess a source file
+calibration.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/calibration.cpp.i
+.PHONY : calibration.cpp.i
+
+calibration.s: calibration.cpp.s
+.PHONY : calibration.s
+
+# target to generate assembly for a file
+calibration.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/calibration.cpp.s
+.PHONY : calibration.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -159,6 +209,7 @@ resources.o: resources.cpp.o
 # target to build an object file
 resources.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/resources.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/resources.cpp.o
 .PHONY : resources.cpp.o
 
 resources.i: resources.cpp.i
@@ -167,6 +218,7 @@ resources.i: resources.cpp.i
 # target to preprocess a source file
 resources.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/resources.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/resources.cpp.i
 .PHONY : resources.cpp.i
 
 resources.s: resources.cpp.s
@@ -175,6 +227,7 @@ resources.s: resources.cpp.s
 # target to generate assembly for a file
 resources.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/resources.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/resources.cpp.s
 .PHONY : resources.cpp.s
 
 # Help Target
@@ -185,7 +238,12 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... build_all"
+	@echo "... calibration"
 	@echo "... main"
+	@echo "... calibration.o"
+	@echo "... calibration.i"
+	@echo "... calibration.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

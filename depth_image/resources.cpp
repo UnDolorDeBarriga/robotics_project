@@ -1,5 +1,7 @@
 #include "resources.h"
 #include <fstream>
+#include <iostream>
+#include <sstream>
 
 
 
@@ -25,6 +27,7 @@ rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumu
         depth_frame depth_frame = frames.get_depth_frame();
         intrinsics = depth_frame.get_profile().as<video_stream_profile>().get_intrinsics();
 
+        //TODO: Make that saves the frames in an array, and does teh computation later, to make sure that the frames are teh continous
         Mat depth_data = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         // Normalize depth values to max distance (in millimeters)
         for (int i = 0; i < WIDTH; i++){
@@ -101,7 +104,6 @@ void write_data_to_files(int n_index, int image_n, const char i_filename[], cons
     cout << camera_position.transpose() << endl;
     cout << camera_angle.transpose() << endl;
 
-    return ;
 
 
     Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
@@ -419,12 +421,12 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
  * @return Eigen::Matrix4d The resulting 4x4 transformation matrix.
  */
 Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_angle){
-    Matrix4d Rx = rotation_matrix(1, -90 + camera_angle[0]);
+    Matrix4d Rx = rotation_matrix(1, camera_angle[0]);
     Matrix4d Ry = rotation_matrix(2, camera_angle[1]);
     Matrix4d Rz = rotation_matrix(3, camera_angle[2]);
 
     Matrix4d T= translation_matrix(camera_position[0], camera_position[1], camera_position[2]);
-    Matrix4d M = T * Rx * Ry *Rz ;
+    Matrix4d M = T * Rz * Ry *Rx;
     return M;
 }
 
