@@ -129,6 +129,45 @@ matrix/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/build
 .PHONY : matrix/fast
 
+#=============================================================================
+# Target rules for targets named better
+
+# Build rule for target.
+better: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 better
+.PHONY : better
+
+# fast build rule for target.
+better/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/better.dir/build.make CMakeFiles/better.dir/build
+.PHONY : better/fast
+
+#=============================================================================
+# Target rules for targets named build_matrix
+
+# Build rule for target.
+build_matrix: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 build_matrix
+.PHONY : build_matrix
+
+# fast build rule for target.
+build_matrix/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_matrix.dir/build.make CMakeFiles/build_matrix.dir/build
+.PHONY : build_matrix/fast
+
+#=============================================================================
+# Target rules for targets named build_better
+
+# Build rule for target.
+build_better: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 build_better
+.PHONY : build_better
+
+# fast build rule for target.
+build_better/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_better.dir/build.make CMakeFiles/build_better.dir/build
+.PHONY : build_better/fast
+
 matrici.o: matrici.cpp.o
 .PHONY : matrici.o
 
@@ -153,12 +192,37 @@ matrici.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/matrici.cpp.s
 .PHONY : matrici.cpp.s
 
+matrici_better.o: matrici_better.cpp.o
+.PHONY : matrici_better.o
+
+# target to build an object file
+matrici_better.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/better.dir/build.make CMakeFiles/better.dir/matrici_better.cpp.o
+.PHONY : matrici_better.cpp.o
+
+matrici_better.i: matrici_better.cpp.i
+.PHONY : matrici_better.i
+
+# target to preprocess a source file
+matrici_better.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/better.dir/build.make CMakeFiles/better.dir/matrici_better.cpp.i
+.PHONY : matrici_better.cpp.i
+
+matrici_better.s: matrici_better.cpp.s
+.PHONY : matrici_better.s
+
+# target to generate assembly for a file
+matrici_better.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/better.dir/build.make CMakeFiles/better.dir/matrici_better.cpp.s
+.PHONY : matrici_better.cpp.s
+
 spatial_transf.o: spatial_transf.cpp.o
 .PHONY : spatial_transf.o
 
 # target to build an object file
 spatial_transf.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/spatial_transf.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/better.dir/build.make CMakeFiles/better.dir/spatial_transf.cpp.o
 .PHONY : spatial_transf.cpp.o
 
 spatial_transf.i: spatial_transf.cpp.i
@@ -167,6 +231,7 @@ spatial_transf.i: spatial_transf.cpp.i
 # target to preprocess a source file
 spatial_transf.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/spatial_transf.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/better.dir/build.make CMakeFiles/better.dir/spatial_transf.cpp.i
 .PHONY : spatial_transf.cpp.i
 
 spatial_transf.s: spatial_transf.cpp.s
@@ -175,6 +240,7 @@ spatial_transf.s: spatial_transf.cpp.s
 # target to generate assembly for a file
 spatial_transf.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/spatial_transf.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/better.dir/build.make CMakeFiles/better.dir/spatial_transf.cpp.s
 .PHONY : spatial_transf.cpp.s
 
 # Help Target
@@ -185,10 +251,16 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... build_better"
+	@echo "... build_matrix"
+	@echo "... better"
 	@echo "... matrix"
 	@echo "... matrici.o"
 	@echo "... matrici.i"
 	@echo "... matrici.s"
+	@echo "... matrici_better.o"
+	@echo "... matrici_better.i"
+	@echo "... matrici_better.s"
 	@echo "... spatial_transf.o"
 	@echo "... spatial_transf.i"
 	@echo "... spatial_transf.s"
