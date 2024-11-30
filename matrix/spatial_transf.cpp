@@ -239,3 +239,30 @@ void merge_matrix(SparseMatrix<int>& big_matrix, SparseMatrix<int>& matrix1, Spa
         }
     }
 }
+
+
+
+void saveSparseMatrixWithZerosToTxt(Eigen::SparseMatrix<int>& mat, const std::string& filename) {
+    // Apri il file
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Errore: impossibile aprire il file " << filename << " per la scrittura.\n";
+        return;
+    }
+
+    // Itera su tutte le righe
+    for (int i = 0; i < mat.rows(); ++i) {
+        for (int j = 0; j < mat.cols(); ++j) {
+            // Accedi all'elemento (i, j), inclusi gli zeri
+            double value = mat.coeff(i, j);
+            file << value;
+            if (j < mat.cols() - 1) {
+                file << ", "; // Aggiungi una virgola per tutti tranne l'ultimo elemento della riga
+            }
+        }
+        file << "\n"; // Fine della riga
+    }
+
+    // Chiudi il file
+    file.close();
+}

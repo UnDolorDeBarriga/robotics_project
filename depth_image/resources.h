@@ -9,7 +9,6 @@
 #include <Eigen/Dense>
 #include <fstream>
 
-#define MIN_DIST 0.0f 
 #define WIDTH 640
 #define HEIGHT 480
 #define FPS 30
@@ -20,12 +19,12 @@ using namespace rs2;
 using namespace cv;
 
 // Function declarations
-rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumulated_depth, Mat &valid_pixel_count, int max_dist);
-void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int max_dist, double maxAbsX, double maxAbsY);
+rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumulated_depth, Mat &valid_pixel_count, int min_dist, int max_dist);
+void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], const char pos_filename[], Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int min_dist, int max_dist, double maxAbsX, double maxAbsY);
 
 void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n);
-vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n);
-Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count);
+vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n, int min_dist, int max_dist);
+Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count, int max_dist);
 void write_depth_to_image(Mat depth_matrix, int max_depth, int n_index, int image_n);
 void get_user_points_input(int image_n, Vector3f &camera_position, Vector3f &camera_angle);
 void get_user_points_file(const char pos_filename[], int image_n, Vector3f &camera_position, Vector3f &camera_angle);

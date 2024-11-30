@@ -23,7 +23,7 @@ int main(){
     int center_x;
     int center_y;
 
-    int dim = 10;
+    int dim = 1;
     int n_lines1, n_lines2;
     double maxAbsX=0;
     double maxAbsY=0;
@@ -32,12 +32,12 @@ int main(){
     Eigen::Matrix4d Ry = RotationMatrix(2, 0);  // Rotazione attorno all'asse Y
     Eigen::Matrix4d Rz = RotationMatrix(3, 0);  // Rotazione attorno all'asse Z
     // Matrice di traslazione
-    Eigen::Matrix4d T= TranslationMatrix(0, 0, 0);  // Traslazione (1, 2, 3)
+    Eigen::Matrix4d T= TranslationMatrix(0, 0, 110);  // Traslazione (1, 2, 3)
     // Matrice di trasformazione spaziale
-    Eigen::Matrix4d M = T * Rx * Ry *Rz ;
+    Eigen::Matrix4d M = T * Rz * Ry *Rx ;
 
     n_lines1 = read_txt("../data/camera_points_image0.txt","../data/reference_points_image0.txt",M, maxAbsX, maxAbsY);
-    n_lines2 = read_txt("../data/camera_points_image1.txt","../data/reference_points_image1.txt",M, maxAbsX, maxAbsY);
+    //n_lines2 = read_txt("../data/camera_points_image1.txt","../data/reference_points_image1.txt",M, maxAbsX, maxAbsY);
     
     int num_rows = std::ceil((maxAbsY) / dim);
     int num_cols = std::ceil((2 * maxAbsX) / dim);
@@ -51,32 +51,36 @@ int main(){
 
     int e = 20;
     populate_matrix_from_file("../data/reference_points_image0.txt", big_matrix1, center_y, center_x, dim, n_lines1);
-    populate_matrix_from_file("../data/reference_points_image1.txt", big_matrix2, center_y, center_x, dim, n_lines2);
+    //populate_matrix_from_file("../data/reference_points_image1.txt", big_matrix2, center_y, center_x, dim, n_lines2);
 
-    if (check_matrix(big_matrix1, big_matrix2, e)) {
-        printf("4");
-        merge_matrix(big_ass_matrix_combined, big_matrix1, big_matrix2);
+   saveSparseMatrixWithZerosToTxt(big_matrix1, "big_matrix1.txt");
 
-        std::ofstream output_file("big_ass_matrix_combined.csv");
-        for (int i = 0; i < big_ass_matrix_combined.rows(); ++i) {
-            for (int j = 0; j < big_ass_matrix_combined.cols(); ++j) {
-                output_file << big_ass_matrix_combined.coeff(i, j);
-                if (j < big_ass_matrix_combined.cols() - 1) {
-                    output_file << ",";
+
+    /*
+        if (check_matrix(big_matrix1, big_matrix2, e)) {
+            printf("4");
+            merge_matrix(big_ass_matrix_combined, big_matrix1, big_matrix2);
+
+            std::ofstream output_file("big_ass_matrix_combined.csv");
+            for (int i = 0; i < big_ass_matrix_combined.rows(); ++i) {
+                for (int j = 0; j < big_ass_matrix_combined.cols(); ++j) {
+                    output_file << big_ass_matrix_combined.coeff(i, j);
+                    if (j < big_ass_matrix_combined.cols() - 1) {
+                        output_file << ",";
+                    }
                 }
+                output_file << "\n";
             }
-            output_file << "\n";
+            output_file.close();
         }
-        output_file.close();
-    }
-    else {
-        printf("5");
-        printf("JAJA PRimo\n");
-    }
+        else {
+            printf("5");
+            printf("JAJA PRimo\n");
+        }
+    */
 
-
-#if False
-    if (check_merge_matrix_with_file("../data/reference_points_image1.txt", big_ass_matrix_combined, center_y, center_x, dim, e)) {
+    #if False
+        if (check_merge_matrix_with_file("../data/reference_points_image1.txt", big_ass_matrix_combined, center_y, center_x, dim, e)) {
         printf("4");
         //merge_matrix_with_file("../data/reference_points_image1.txt", big_ass_matrix_combined, center_y, center_x, 1);   
     }

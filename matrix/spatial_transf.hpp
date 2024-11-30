@@ -20,5 +20,6 @@ void merge_matrix_with_file(const char i_filename[], MatrixXd& matrix, int cente
 
 bool check_matrix(SparseMatrix<int>& matrix1, SparseMatrix<int>& matrix2, int e);
 void merge_matrix(SparseMatrix<int>& big_matrix, SparseMatrix<int>& matrix1, SparseMatrix<int>& matrix2);
+void saveSparseMatrixWithZerosToTxt(Eigen::SparseMatrix<int>& mat, const std::string& filename);
 
 #endif

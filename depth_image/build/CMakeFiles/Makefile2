@@ -65,7 +65,6 @@ CMAKE_BINARY_DIR = /home/arnau/Desktop/robotics_project/depth_image/build
 # The main recursive "all" target.
 all: CMakeFiles/main.dir/all
 all: CMakeFiles/calibration.dir/all
-all: CMakeFiles/build_all.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -76,6 +75,8 @@ preinstall:
 clean: CMakeFiles/main.dir/clean
 clean: CMakeFiles/calibration.dir/clean
 clean: CMakeFiles/build_all.dir/clean
+clean: CMakeFiles/build_main.dir/clean
+clean: CMakeFiles/build_calibration.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -156,6 +157,58 @@ build_all: CMakeFiles/build_all.dir/rule
 CMakeFiles/build_all.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_all.dir/build.make CMakeFiles/build_all.dir/clean
 .PHONY : CMakeFiles/build_all.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/build_main.dir
+
+# All Build rule for target.
+CMakeFiles/build_main.dir/all: CMakeFiles/main.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_main.dir/build.make CMakeFiles/build_main.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_main.dir/build.make CMakeFiles/build_main.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles --progress-num= "Built target build_main"
+.PHONY : CMakeFiles/build_main.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/build_main.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/build_main.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles 0
+.PHONY : CMakeFiles/build_main.dir/rule
+
+# Convenience name for target.
+build_main: CMakeFiles/build_main.dir/rule
+.PHONY : build_main
+
+# clean rule for target.
+CMakeFiles/build_main.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_main.dir/build.make CMakeFiles/build_main.dir/clean
+.PHONY : CMakeFiles/build_main.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/build_calibration.dir
+
+# All Build rule for target.
+CMakeFiles/build_calibration.dir/all: CMakeFiles/calibration.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_calibration.dir/build.make CMakeFiles/build_calibration.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_calibration.dir/build.make CMakeFiles/build_calibration.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles --progress-num= "Built target build_calibration"
+.PHONY : CMakeFiles/build_calibration.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/build_calibration.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/build_calibration.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles 0
+.PHONY : CMakeFiles/build_calibration.dir/rule
+
+# Convenience name for target.
+build_calibration: CMakeFiles/build_calibration.dir/rule
+.PHONY : build_calibration
+
+# clean rule for target.
+CMakeFiles/build_calibration.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_calibration.dir/build.make CMakeFiles/build_calibration.dir/clean
+.PHONY : CMakeFiles/build_calibration.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

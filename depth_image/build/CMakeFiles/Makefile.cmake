@@ -64,4 +64,6 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/main.dir/DependInfo.cmake"
   "CMakeFiles/calibration.dir/DependInfo.cmake"
   "CMakeFiles/build_all.dir/DependInfo.cmake"
+  "CMakeFiles/build_main.dir/DependInfo.cmake"
+  "CMakeFiles/build_calibration.dir/DependInfo.cmake"
   )

@@ -16,11 +16,13 @@
  * @param n_index The number of frames to capture.
  * @param accumulated_depth A matrix to accumulate the depth values.
  * @param valid_pixel_count A matrix to count the number of valid depth measurements for each pixel.
+ * @param min_dist The minimum distance to consider for depth measurements (in meters).
  * @param max_dist The maximum distance to consider for depth measurements (in meters).
  * @return rs2_intrinsics The camera intrinsics of the captured frames.
  */
-rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumulated_depth, Mat &valid_pixel_count, int max_dist) {
+rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumulated_depth, Mat &valid_pixel_count, int min_dist, int max_dist) {
     rs2_intrinsics intrinsics;
+    int max_dist_mm = max_dist * 1000;
     for (int frame_count = 0; frame_count < n_index; ++frame_count) {
         // Wait for the next set of frames
         frameset frames = pipeline.wait_for_frames();
@@ -33,9 +35,9 @@ rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumu
         for (int i = 0; i < WIDTH; i++){
             for (int j = 0; j < HEIGHT; j++){
                 float depth = depth_frame.get_distance(i, j);
-                if (depth >= MIN_DIST) {
+                if (depth >= min_dist) {
                     if (depth >= max_dist) {
-                        depth_data.at<float>(j, i) = (max_dist*1000);
+                        depth_data.at<float>(j, i) = max_dist_mm;
                     }
                     else {
                         depth_data.at<float>(j, i) = depth * 1000;  // Convert depth to millimeters
@@ -64,17 +66,19 @@ rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumu
  * @param image_n Index of the current image.
  * @param i_filename Input filename for depth data.
  * @param o_filename Output filename for transformed coordinates.
+ * @param pos_filename Filename for camera position and angle data.
  * @param accumulated_depth Accumulated depth data.
  * @param valid_pixel_count Count of valid pixels in the depth data.
  * @param intrinsics Camera intrinsics for depth deprojection.
- * @param max_dist Maximum distance for depth values.
+ * @param min_dist Minimum distance for depth values (in meters).
+ * @param max_dist Maximum distance for depth values (in meters).
  * @param maxAbsX Maximum absolute X coordinate for transformation.
  * @param maxAbsY Maximum absolute Y coordinate for transformation.
  */
-void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int max_dist, double maxAbsX, double maxAbsY) {
+void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], const char pos_filename[], Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int min_dist, int max_dist, double maxAbsX, double maxAbsY) {
 
     // Compute the mean depth image
-    Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count);
+    Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count, max_dist);
     printf("Computed mean depth for image %d\n", image_n);
     
     // Write the depth data to a CSV file
@@ -82,7 +86,7 @@ void write_data_to_files(int n_index, int image_n, const char i_filename[], cons
     printf("Wrote depth data to CSV for image %d\n", image_n);
     
     // Deproject the mean depth image into 3D points
-    auto points_image = deproject_depth_to_3d(i_filename, average_depth, intrinsics, image_n);
+    auto points_image = deproject_depth_to_3d(i_filename, average_depth, intrinsics, image_n, min_dist, max_dist);
     printf("Deprojected depth to 3D for image %d\n", image_n);
 
     // Write the mean depth image to a PNG file
@@ -93,16 +97,10 @@ void write_data_to_files(int n_index, int image_n, const char i_filename[], cons
     Vector3f camera_position;
     Vector3f camera_angle;
     
-
-    //TODO: Put that pos filename is a var defined in main and pass it as a parameter
     //get_user_points_input(image_n, camera_position, camera_angle);
-    char pos_filename[100];
-    sprintf(pos_filename, "../position_camera.txt");
     get_user_points_file(pos_filename, image_n, camera_position, camera_angle);
-    //camera_position = Vector3f(0.0, 0.0, 0.0);
-    //camera_angle = Vector3f(0.0, 0.0, 0.0);
-    cout << camera_position.transpose() << endl;
-    cout << camera_angle.transpose() << endl;
+    cout << "Camera Position" << camera_position.transpose() << endl;
+    cout << "Camera Angle" << camera_angle.transpose() << endl;
 
 
 
@@ -125,12 +123,18 @@ void write_data_to_files(int n_index, int image_n, const char i_filename[], cons
  * @param valid_pixel_count A matrix of valid pixel counts for each pixel (CV_32SC1).
  * @return A matrix of average depth values for each pixel (CV_32FC1).
  */
-Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count) {
+Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count, int max_dist) {
     Mat average_depth = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
+    float average_depth_point = 0.0f;
     for (int x = 0; x < accumulated_depth.cols; ++x) {
         for (int y = 0; y < accumulated_depth.rows; ++y) {
             if (valid_pixel_count.at<int>(y, x) > 0) {
-                average_depth.at<float>(y, x) = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
+                average_depth_point = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
+                if (average_depth_point >= 0.99*(max_dist*1000)){
+                    average_depth.at<float>(y, x) = max_dist*1000; 
+                } else {
+                    average_depth.at<float>(y, x) = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
+                }
             }
         }
     }
@@ -170,14 +174,16 @@ void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n) {
  * @param depth_matrix The depth matrix data.
  * @param intrinsics The camera intrinsics.
  * @param image_n The image number.
+ * @param min_dist The minimum distance for depth values (in meters).
+ * @param max_dist The maximum distance for depth values (in meters).
  * @return std::vector<Eigen::Vector3f> The 3D points.
  */
-vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n) {
+vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n, int min_dist, int max_dist) {
     vector<Eigen::Vector3f> points;
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
             float depth = depth_matrix.at<float>(y, x);
-            if (depth > 0) {
+            if (depth > (min_dist*1000) && depth < (max_dist*1000)) {
                 float point[3];
                 float pixel[2] = { static_cast<float>(x), static_cast<float>(y) };
                 rs2_deproject_pixel_to_point(point, &intrinsics, pixel, depth);
@@ -267,13 +273,23 @@ void get_user_points_input(int image_n, Vector3f &camera_position, Vector3f &cam
 
 
 
+/**
+ * @brief Reads the camera position and angle from a file and stores them in the provided vectors.
+ *
+ * This function opens a file specified by the given filename, reads the camera position and angle
+ * from the first two lines of the file, and stores the values in the provided Vector3f objects.
+ *
+ * @param pos_filename The path to the file containing the camera position and angle.
+ * @param image_n An integer representing the image number (not used in the function).
+ * @param camera_position A reference to a Vector3f object where the camera position will be stored.
+ * @param camera_angle A reference to a Vector3f object where the camera angle will be stored.
+ */
 void get_user_points_file(const char pos_filename[], int image_n, Vector3f &camera_position, Vector3f &camera_angle) {
     ifstream file(pos_filename);
     if (!file.is_open()) {
         cerr << "Error opening position file!" << endl;
         return;
     }
-
     string line;
     getline(file, line);
     stringstream ss_position(line);
@@ -291,6 +307,7 @@ void get_user_points_file(const char pos_filename[], int image_n, Vector3f &came
     ss_angle.ignore(1); // Ignore the comma
     ss_angle >> camera_angle(2);
     file.close();
+    return;
 }
 
 
@@ -364,6 +381,8 @@ Matrix4d translation_matrix(double tx, double ty, double tz) {
  * @param M A 4x4 transformation matrix to be applied to each 3D coordinate.
  * @param maxAbsX A reference to a double variable where the maximum absolute value of the transformed x coordinates will be stored.
  * @param maxAbsY A reference to a double variable where the maximum absolute value of the transformed y coordinates will be stored.
+ * @param camera_position The camera position vector.
+ * @param camera_angle The camera angle vector.
  * 
  * @throws ios_base::failure If the input file cannot be opened.
  */
@@ -421,11 +440,11 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
  * @return Eigen::Matrix4d The resulting 4x4 transformation matrix.
  */
 Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_angle){
-    Matrix4d Rx = rotation_matrix(1, camera_angle[0]);
-    Matrix4d Ry = rotation_matrix(2, camera_angle[1]);
-    Matrix4d Rz = rotation_matrix(3, camera_angle[2]);
+    Matrix4d Rx = rotation_matrix(1, -90 - camera_angle[0]);
+    Matrix4d Ry = rotation_matrix(2, -camera_angle[1]);
+    Matrix4d Rz = rotation_matrix(3, -camera_angle[2]);
 
-    Matrix4d T= translation_matrix(camera_position[0], camera_position[1], camera_position[2]);
+    Matrix4d T= translation_matrix(-camera_position[0], -camera_position[1], -camera_position[2]);
     Matrix4d M = T * Rz * Ry *Rx;
     return M;
 }

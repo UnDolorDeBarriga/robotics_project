@@ -155,6 +155,32 @@ build_all/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_all.dir/build.make CMakeFiles/build_all.dir/build
 .PHONY : build_all/fast
 
+#=============================================================================
+# Target rules for targets named build_main
+
+# Build rule for target.
+build_main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 build_main
+.PHONY : build_main
+
+# fast build rule for target.
+build_main/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_main.dir/build.make CMakeFiles/build_main.dir/build
+.PHONY : build_main/fast
+
+#=============================================================================
+# Target rules for targets named build_calibration
+
+# Build rule for target.
+build_calibration: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 build_calibration
+.PHONY : build_calibration
+
+# fast build rule for target.
+build_calibration/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_calibration.dir/build.make CMakeFiles/build_calibration.dir/build
+.PHONY : build_calibration/fast
+
 calibration.o: calibration.cpp.o
 .PHONY : calibration.o
 
@@ -239,6 +265,8 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... build_all"
+	@echo "... build_calibration"
+	@echo "... build_main"
 	@echo "... calibration"
 	@echo "... main"
 	@echo "... calibration.o"

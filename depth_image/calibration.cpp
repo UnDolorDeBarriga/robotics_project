@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
         printf("Failed to open the CSV file.\n");
         return 0;
     }
-    for(int y = (square_y_m-50); y < (square_y_m+50) ; y++) {
-        for(int x = (square_x_m-50); x < (square_x_m+50) ; x++) {
+    for(int y = 0 ; y < HEIGHT ; y++) {
+        for(int x = 0 ; x < WIDTH ; x++) {
             float depth_mm = average_depth.at<float>(y, x);
             csv_file << depth_mm << ",";
         }

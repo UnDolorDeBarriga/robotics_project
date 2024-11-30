@@ -24,5 +24,9 @@ target_link_libraries(main ${realsense2_LIBRARY} ${OpenCV_LIBS} ${EIGEN3_LIBRARI
 target_link_libraries(calibration ${realsense2_LIBRARY} ${OpenCV_LIBS} ${EIGEN3_LIBRARIES} ${OPENGL_LIBRARIES} glfw)
 
 # Ensure both executables are built with the 'all' target
-add_custom_target(build_all ALL DEPENDS main calibration)
+add_custom_target(build_all DEPENDS main calibration)
+
+# Custom targets for individual builds
+add_custom_target(build_main DEPENDS main)
+add_custom_target(build_calibration DEPENDS calibration)
 # g++ -o rs-test rs-test.cpp -I/usr/local/include -L/usr/local/lib -lrealsense2 `pkg-config --cflags --libs opencv4`

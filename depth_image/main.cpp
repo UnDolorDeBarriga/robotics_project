@@ -7,14 +7,15 @@
 
 // Main function
 int main(int argc, char *argv[]) {
-    if (argc != 5) {
-        printf("Usage: %s <number of images that are going to be computed> <maximum distance(m)> <number of frames> <cell discretization(mm)>\n", argv[0]);
+    if (argc != 6) {
+        printf("Usage: %s <number of images that are going to be computed> <minimum distance(m)> <maximum distance(m)> <number of frames> <cell discretization(mm)>\n", argv[0]);
         return EXIT_FAILURE;
     }
     int n_images = atoi(argv[1]);
-    int max_dist = atoi(argv[2]);
-    int n_index = atoi(argv[3]);
-    int cell_dim = atoi(argv[4]);
+    int min_dist = atoi(argv[2]);
+    int max_dist = atoi(argv[3]);
+    int n_index = atoi(argv[4]);
+    int cell_dim = atoi(argv[5]);
 
     double maxAbsX=0;
     double maxAbsY=0;
@@ -47,7 +48,7 @@ int main(int argc, char *argv[]) {
         Mat accumulated_depth = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         Mat valid_pixel_count = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         
-        intrinsics = get_main_frames_count(pipeline, n_index, accumulated_depth, valid_pixel_count, max_dist);
+        intrinsics = get_main_frames_count(pipeline, n_index, accumulated_depth, valid_pixel_count, min_dist, max_dist);
         //aqui va too       
 
         char i_filename[100];
@@ -55,8 +56,10 @@ int main(int argc, char *argv[]) {
         char o_filename[100];
         sprintf(o_filename, "../data/reference_points_image%d.txt", image_n);
         filenames.push_back(o_filename);
+        char pos_filename[100];
+        sprintf(pos_filename, "../position_camera.txt");
 
-        write_data_to_files(n_index, image_n, i_filename, o_filename, accumulated_depth, valid_pixel_count, intrinsics, max_dist, maxAbsX, maxAbsY);
+        write_data_to_files(n_index, image_n, i_filename, o_filename, pos_filename, accumulated_depth, valid_pixel_count, intrinsics,min_dist, max_dist, maxAbsX, maxAbsY);
 
         // Wait for a keyboard input
         if (image_n != n_images-1) {

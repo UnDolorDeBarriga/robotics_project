@@ -5,11 +5,8 @@ Stdd: 4 mm
 Dist: 1874 mm, Averaged in 500 frames
 Average: 1936 mm
 Stdd: 13 mm
-Dist: 2690 mm, Averaged in 500 frames
-Average: 2953 mm
-Stdd: 9 mm
 
-Dist: 2690 mm, Averaged in 500 frames
+Dist: 286 mm, Averaged in 500 frames
 Average: 2953 mm
 Stdd: 8 mm
 
