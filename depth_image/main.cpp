@@ -1,10 +1,10 @@
 #include "resources.h"
-// #include <stdlib.h>
-// #include <stdint.h>
-// #include <stdio.h>
-// #include <chrono>
-// #include <thread>
-
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <chrono>
+#include <thread>
+#include <Eigen/Sparse>
 
 // Main function
 int main(int argc, char *argv[]) {
@@ -36,9 +36,7 @@ int main(int argc, char *argv[]) {
         printf("No device found.\n");
         return EXIT_FAILURE;
     } else {
-        #if DEBUG
         printf("Device found.\n");
-        #endif
     }
 
     // Get depth intrinsics
@@ -74,38 +72,23 @@ int main(int argc, char *argv[]) {
     // Stop the pipeline
     pipeline.stop();
     
-    int num_rows = (ceil((maxAbsY) / cell_dim))+1;
-    int num_cols = (ceil((2 * maxAbsX) / cell_dim))+1;
+    printf("1");
     
-    center_y = num_rows;
-    center_x = num_cols / 2;
+    Eigen::SparseMatrix<double> big_ass_sparse_matrix_combined;
+    big_ass_sparse_matrix_combined.resize(ceil((2 * maxAbsY) / cell_dim) + 1, ceil((2 * maxAbsX) / cell_dim) + 1);
+    printf("2");
 
-    int e = 20;
-
-    Mat big_matrix_combined = Mat::zeros(num_rows, num_cols, CV_8UC1);
-    Mat big_matrix2 = Mat::zeros(num_rows, num_cols, CV_8UC1);
-    Mat big_matrix3 = Mat::zeros(num_rows, num_cols, CV_8UC1);
-
-    cout << "Num Cols: " << num_cols << endl;
-    cout << "Num Rows: " << num_rows << endl;
-
-    for(int i = 0; i < n_images; i++){
-        populate_matrix_from_file(filenames[i].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
+    for (const auto& filename : filenames) {
+        populate_sparse_matrix_from_file(filename.c_str(), big_ass_sparse_matrix_combined, center_y, center_x, cell_dim);
     }
-
-    int max = save_matrix_with_zeros(big_matrix_combined, "../data/combinated_info_points.txt", num_rows, num_cols);
-   
-    cv::imwrite("../data/big_matrix_image.png", big_matrix_combined);
 
     return 0;
 
-    // Eigen::SparseMatrix<double> big_ass_sparse_matrix_combined;
-    // big_ass_sparse_matrix_combined.resize(ceil((2 * maxAbsY) / cell_dim) + 1, ceil((2 * maxAbsX) / cell_dim) + 1);
-    // printf("2");
+    printf("3");
 
-    // for (const auto& filename : filenames) {
-    //     populate_sparse_matrix_from_file(filename.c_str(), big_ass_sparse_matrix_combined, center_y, center_x, cell_dim);
-    // }
+    printf("N Rows: %d\n", big_ass_sparse_matrix_combined.rows());
+    printf("N Cols: %d\n", big_ass_sparse_matrix_combined.cols());
+
 
     return 0;
 }
