@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Compute the mean depth image
-    Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count);
+    Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count, max_dist);
    
     int square_x_m = WIDTH/2;
     int square_y_m = HEIGHT/2;

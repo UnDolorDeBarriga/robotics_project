@@ -3,8 +3,6 @@
 #include <iostream>
 #include <sstream>
 
-
-
 /**
  * @brief Captures depth frames and accumulates depth data.
  * 
@@ -29,7 +27,6 @@ rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumu
         depth_frame depth_frame = frames.get_depth_frame();
         intrinsics = depth_frame.get_profile().as<video_stream_profile>().get_intrinsics();
 
-        //TODO: Make that saves the frames in an array, and does teh computation later, to make sure that the frames are teh continous
         Mat depth_data = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         // Normalize depth values to max distance (in millimeters)
         for (int i = 0; i < WIDTH; i++){
@@ -199,8 +196,6 @@ vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix
     return points;
 }
 
-
-
 /**
  * @brief Writes the depth_matrix data to an image file.
  * 
@@ -270,9 +265,6 @@ void get_user_points_input(int image_n, Vector3f &camera_position, Vector3f &cam
     return;
 }
 
-
-
-
 /**
  * @brief Reads the camera position and angle from a file and stores them in the provided vectors.
  *
@@ -309,8 +301,6 @@ void get_user_points_file(const char pos_filename[], int image_n, Vector3f &came
     file.close();
     return;
 }
-
-
 
 /**
  * @brief Generates a 4x4 rotation matrix for a given axis and angle.
@@ -370,7 +360,6 @@ Matrix4d translation_matrix(double tx, double ty, double tz) {
     return translation;
 }
 
-
 /**
  * @brief Reads a text file containing 3D coordinates, applies a transformation matrix, and writes the transformed coordinates to an output file.
  * 
@@ -427,8 +416,6 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
     return;
 }
 
-
-
 /**
  * @brief Creates a transformation matrix from camera position and angle.
  * 
@@ -448,8 +435,6 @@ Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_
     Matrix4d M = T * Rz * Ry *Rx;
     return M;
 }
-
-
 
 /**
  * @brief Creates a matrix with specified dimensions and calculates the center point.
@@ -475,9 +460,6 @@ MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center
     center_point_col = num_cols / 2;
     return z_matrix;
 }
-
-
-
 
 /**
  * @brief Populates a matrix from a file containing 3D coordinates.
@@ -519,4 +501,47 @@ void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int ce
         }
     }
     file.close();
+    return;
+}
+
+/**
+ * @brief Populates a sparse matrix from a file containing 3D coordinates.
+ * 
+ * This function reads 3D coordinates from an input file and populates a sparse matrix with the z-values.
+ * The matrix is centered around a specified center point, and the coordinates are scaled based on the cell dimension.
+ * 
+ * @param i_filename The path to the input file containing 3D coordinates.
+ * @param matrix The sparse matrix to be populated with z-values.
+ * @param center_point_row The row index of the center point in the matrix.
+ * @param center_point_col The column index of the center point in the matrix.
+ * @param cell_dim The dimension of each cell in the matrix.
+ */
+void populate_sparse_matrix_from_file(const char i_filename[], Eigen::SparseMatrix<double>& matrix, int center_point_row, int center_point_col, int cell_dim) {
+    ifstream file(i_filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file!" << endl;
+        return;
+    }
+    int row, col;
+    string line;
+    while (getline(file, line)) {
+        istringstream iss(line);
+        double x, y, z;
+        char comma1, comma2;
+        if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
+            cerr << "Invalid line format: " << line << endl;
+            continue;
+        }
+
+        col = center_point_col + static_cast<int>(floor(x / cell_dim));
+        row = center_point_row - static_cast<int>(floor(y / cell_dim));
+
+        if (row >= 0 && row < matrix.rows() && col >= 0 && col < matrix.cols()) {
+            matrix.coeffRef(row, col) = static_cast<int>(round(z)); // Assign the z value to the appropriate cell
+        } else {
+            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: "<< row <<" col: " <<col<<")" << endl;
+        }
+    }
+    file.close();
+    return;
 }

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <chrono>
 #include <thread>
+#include <Eigen/Sparse>
 
 // Main function
 int main(int argc, char *argv[]) {
@@ -34,8 +35,7 @@ int main(int argc, char *argv[]) {
     if (!dev) {
         printf("No device found.\n");
         return EXIT_FAILURE;
-    }
-    else {
+    } else {
         printf("Device found.\n");
     }
 
@@ -74,15 +74,20 @@ int main(int argc, char *argv[]) {
     
     printf("1");
     
-    MatrixXd big_ass_matrix_combined = create_matrix(maxAbsX, maxAbsY, cell_dim, center_y, center_x);
+    Eigen::SparseMatrix<double> big_ass_sparse_matrix_combined;
+    big_ass_sparse_matrix_combined.resize(ceil((2 * maxAbsY) / cell_dim) + 1, ceil((2 * maxAbsX) / cell_dim) + 1);
     printf("2");
+
+    for (const auto& filename : filenames) {
+        populate_sparse_matrix_from_file(filename.c_str(), big_ass_sparse_matrix_combined, center_y, center_x, cell_dim);
+    }
 
     return 0;
 
     printf("3");
 
-    printf("N Rows: %d\n", big_ass_matrix_combined.rows());
-    printf("N Cols: %d\n", big_ass_matrix_combined.cols());
+    printf("N Rows: %d\n", big_ass_sparse_matrix_combined.rows());
+    printf("N Cols: %d\n", big_ass_sparse_matrix_combined.cols());
 
 
     return 0;

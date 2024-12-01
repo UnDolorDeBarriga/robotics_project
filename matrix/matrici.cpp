@@ -42,9 +42,9 @@ int main(){
     int num_rows = std::ceil((maxAbsY) / dim);
     int num_cols = std::ceil((2 * maxAbsX) / dim);
     
-    SparseMatrix<int> big_ass_matrix_combined(num_rows, num_cols+1);
-    SparseMatrix<int> big_matrix1(num_rows, num_cols+1);
-    SparseMatrix<int> big_matrix2(num_rows, num_cols+1);
+    SparseMatrix<int> big_ass_matrix_combined(num_rows+1, num_cols+1);
+    SparseMatrix<int> big_matrix1(num_rows+1, num_cols+1);
+    SparseMatrix<int> big_matrix2(num_rows+1, num_cols+1);
     center_y = num_rows;
     center_x = num_cols / 2;
 
@@ -53,7 +53,20 @@ int main(){
     populate_matrix_from_file("../data/reference_points_image0.txt", big_matrix1, center_y, center_x, dim, n_lines1);
     //populate_matrix_from_file("../data/reference_points_image1.txt", big_matrix2, center_y, center_x, dim, n_lines2);
 
-   saveSparseMatrixWithZerosToTxt(big_matrix1, "big_matrix1.txt");
+   saveSparseMatrixWithZerosToTxt(big_matrix1, "../data/big_matrix1.txt");
+
+
+    // Convert SparseMatrix to OpenCV Mat
+    cv::Mat image(num_rows + 1, num_cols + 1, CV_8UC1, cv::Scalar(255)); // Initialize with white background
+
+    for (int k = 0; k < big_matrix1.outerSize(); ++k) {
+        for (SparseMatrix<int>::InnerIterator it(big_matrix1, k); it; ++it) {
+            image.at<uchar>(it.row(), it.col()) = 0; // Set pixel to black for non-zero entries
+        }
+    }
+
+    // Save the image as PNG
+    cv::imwrite("../data/big_matrix1.png", image);
 
 
     /*

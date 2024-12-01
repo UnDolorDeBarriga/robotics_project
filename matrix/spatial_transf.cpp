@@ -114,7 +114,7 @@ void populate_matrix_from_file(const char i_filename[], SparseMatrix<int>& matri
         if (row >= 0 && row < matrix.rows() && col >= 0 && col < matrix.cols()) {
             int z_value = static_cast<int>(round(z));
             if (matrix.coeff(row, col) == 0) {
-                matrix.insert(row, col) = z_value;
+                matrix.coeffRef(row, col) = z_value;
             } else if (matrix.coeff(row, col) < z_value) {
                 matrix.coeffRef(row, col) = z_value;
             }
@@ -265,4 +265,70 @@ void saveSparseMatrixWithZerosToTxt(Eigen::SparseMatrix<int>& mat, const std::st
 
     // Chiudi il file
     file.close();
+}
+
+
+
+void populate_matrix_from_file_better(const char i_filename[], cv::Mat& matrix, int center_point_row, int center_point_col, int cell_dim, int n_rows, int n_cols) { 
+    ifstream file(i_filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file!" << endl;
+        return;
+    }
+    int row, col;
+    int z_value;
+
+
+    string line;
+    while (getline(file, line)) {
+        istringstream iss(line);
+        double x, y, z;
+        char comma1, comma2;
+        if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
+            cerr << "Invalid line format: " << line << endl;
+            continue;
+        }
+        col = center_point_col + static_cast<int>(floor(x / cell_dim));
+        row = center_point_row - static_cast<int>(floor(y / cell_dim));
+
+
+        if (row >= 0 && row < n_rows && col >= 0 && col < n_cols) {
+            z_value = static_cast<int>(round(z));
+            if(matrix.at<uchar>(row, col) < z_value || matrix.at<uchar>(row, col) == 0){
+                matrix.at<uchar>(row, col) = z_value;
+            }
+        } else {
+            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: " << row << " col: " << col << ")" << endl;
+        }
+    }
+    file.close();
+    return;
+}
+
+
+int saveSparseMatrixWithZerosToTxt_better(cv::Mat& mat, const std::string& filename, int n_rows, int n_cols) {
+    // Apri il file
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Errore: impossibile aprire il file " << filename << " per la scrittura.\n";
+        return 0;
+    }
+    double value;
+    int max = 0;
+
+    for (int i = 0; i < n_rows; ++i) {
+        for (int j = 0; j < n_cols; ++j) {
+            value = mat.at<uchar>(i, j);
+            if(max < value){
+                max = value;
+            }
+            file << value;
+            if (j < n_cols - 1) {
+                file << ", ";
+            }
+        }
+        file << "\n";
+    }
+    file.close();
+    return max;
 }

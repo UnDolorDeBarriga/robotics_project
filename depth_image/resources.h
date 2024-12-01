@@ -36,6 +36,8 @@ Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_
 
 MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col);
 void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim);
+void populate_sparse_matrix_from_file(const char i_filename[], Eigen::SparseMatrix<double>& matrix, int center_point_row, int center_point_col, int cell_dim);
+
 #endif // RESOURCES_H
 
 
