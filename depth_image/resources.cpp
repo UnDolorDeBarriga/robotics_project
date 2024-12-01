@@ -1,7 +1,5 @@
 #include "resources.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
+// #include <sstream>
 
 /**
  * @brief Captures depth frames and accumulates depth data.
@@ -72,41 +70,51 @@ rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumu
  * @param maxAbsX Maximum absolute X coordinate for transformation.
  * @param maxAbsY Maximum absolute Y coordinate for transformation.
  */
-void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], const char pos_filename[], Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int min_dist, int max_dist, double maxAbsX, double maxAbsY) {
+void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], const char pos_filename[],
+                         Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int min_dist, int max_dist, 
+                         double& maxAbsX, double& maxAbsY) {
 
     // Compute the mean depth image
     Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count, max_dist);
+#if DEBUG
     printf("Computed mean depth for image %d\n", image_n);
-    
+#endif
+
     // Write the depth data to a CSV file
     write_depth_to_csv(average_depth, n_index, image_n);
+#if DEBUG
     printf("Wrote depth data to CSV for image %d\n", image_n);
-    
+#endif
+
     // Deproject the mean depth image into 3D points
     auto points_image = deproject_depth_to_3d(i_filename, average_depth, intrinsics, image_n, min_dist, max_dist);
+#if DEBUG
     printf("Deprojected depth to 3D for image %d\n", image_n);
+#endif
 
     // Write the mean depth image to a PNG file
     write_depth_to_image(average_depth, (max_dist*1000), n_index, image_n);
+#if DEBUG
     printf("Wrote depth image to PNG for image %d\n", image_n);
-    
+#endif
     // Get the user points for the camera position and angle
-    Vector3f camera_position;
-    Vector3f camera_angle;
+    Vector3f camera_position, camera_angle;
     
     //get_user_points_input(image_n, camera_position, camera_angle);
     get_user_points_file(pos_filename, image_n, camera_position, camera_angle);
-    cout << "Camera Position" << camera_position.transpose() << endl;
-    cout << "Camera Angle" << camera_angle.transpose() << endl;
-
-
+#if DEBUG
+    cout << "Camera Position: " << camera_position.transpose() << endl;
+    cout << "Camera Angle: " << camera_angle.transpose() << endl;
+#endif
 
     Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
+#if DEBUG
     printf("Created transformation matrix for image %d\n", image_n);
-
+#endif
     transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY, camera_position, camera_angle);
+#if DEBUG
     printf("Transformed coordinates for image %d\n", image_n);
-
+#endif
     return;
 }
 
@@ -437,6 +445,112 @@ Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_
 }
 
 /**
+ * @brief Populates a matrix with values from a file.
+ *
+ * This function reads a file containing x, y, z coordinates and populates the given matrix
+ * with the z values. The coordinates are adjusted based on the provided center point and cell dimensions.
+ *
+ * @param i_filename The path to the input file containing the coordinates.
+ * @param matrix The matrix to be populated with z values.
+ * @param center_point_row The row index of the center point in the matrix.
+ * @param center_point_col The column index of the center point in the matrix.
+ * @param cell_dim The dimension of each cell in the matrix.
+ * @param n_rows The number of rows in the matrix.
+ * @param n_cols The number of columns in the matrix.
+ *
+ * The input file should have lines in the format: x,y,z
+ * where x, y are coordinates and z is the value to be placed in the matrix.
+ * If the coordinates are out of the matrix bounds, an error message is printed.
+ * If the z value at a position is greater than the current value or the current value is 0,
+ * the matrix is updated with the new z value.
+ */
+void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int center_point_row, int center_point_col, int cell_dim, int n_rows, int n_cols) { 
+    ifstream file(i_filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file!" << endl;
+        return;
+    }
+    int row, col;
+    int z_value;
+
+    string line;
+    // Ignore the first two lines
+    getline(file, line);
+    getline(file, line);
+    while (getline(file, line)) {
+        istringstream iss(line);
+        double x, y, z;
+        char comma1, comma2;
+        if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
+            cerr << "Invalid line format: " << line << endl;
+            continue;
+        }
+        col = center_point_col + static_cast<int>(floor(x / cell_dim));
+        row = center_point_row - static_cast<int>(floor(y / cell_dim));
+
+
+        if (row >= 0 && row <= n_rows && col >= 0 && col <= n_cols) {
+            z_value = static_cast<int>(round(z));
+            if(matrix.at<uchar>(row, col) < z_value || matrix.at<uchar>(row, col) == 0){
+                matrix.at<uchar>(row, col) = z_value;
+            }
+        } else {
+            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: " << row << " col: " << col << ")" << endl;
+        }
+    }
+    file.close();
+    return;
+}
+
+/**
+ * @brief Saves the given matrix to a file with zeros and returns the maximum value in the matrix.
+ *
+ * This function writes the contents of the given OpenCV matrix to a file specified by the filename.
+ * Each element in the matrix is separated by a comma, and each row is written on a new line.
+ * The function also finds and returns the maximum value in the matrix.
+ *
+ * @param mat The OpenCV matrix to be saved.
+ * @param filename The name of the file to save the matrix to.
+ * @param n_rows The number of rows in the matrix.
+ * @param n_cols The number of columns in the matrix.
+ * @return The maximum value found in the matrix.
+ */
+int save_matrix_with_zeros(cv::Mat& mat, const std::string& filename, int n_rows, int n_cols) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file!" << endl;
+        return 0;
+    }
+    double value;
+    int max = 0;
+    for (int i = 0; i < n_rows; ++i) {
+        for (int j = 0; j < n_cols; ++j) {
+            value = mat.at<uchar>(i, j);
+            if(max < value){
+                max = value;
+            }
+            file << value;
+            if (j < n_cols - 1) {
+                file << ", ";
+            }
+            if(value == 0){
+                mat.at<uchar>(i, j) = 255;
+            }
+
+        }
+        file << "\n";
+    }
+    file.close();
+    return max;
+}
+
+
+
+
+
+#if False
+
+/**
  * @brief Creates a matrix with specified dimensions and calculates the center point.
  *
  * This function generates a matrix of zeros with dimensions based on the provided
@@ -473,7 +587,7 @@ MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center
  * @param center_point_col The column index of the center point in the matrix.
  * @param cell_dim The dimension of each cell in the matrix.
  */
-void populate_matrix_from_file(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim) {
+void populate_matrix_from_file_old(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim) {
     ifstream file(i_filename);
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
@@ -545,3 +659,6 @@ void populate_sparse_matrix_from_file(const char i_filename[], Eigen::SparseMatr
     file.close();
     return;
 }
+
+
+#endif
