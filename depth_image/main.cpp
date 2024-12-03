@@ -83,17 +83,32 @@ int main(int argc, char *argv[]) {
     int e = 20;
 
     Mat big_matrix_combined = Mat::zeros(num_rows, num_cols, CV_8UC1);
-    Mat big_matrix2 = Mat::zeros(num_rows, num_cols, CV_8UC1);
-    Mat big_matrix3 = Mat::zeros(num_rows, num_cols, CV_8UC1);
+    Mat matrix_to_be_merged = Mat::zeros(num_rows, num_cols, CV_8UC1);
 
     cout << "Num Cols: " << num_cols << endl;
     cout << "Num Rows: " << num_rows << endl;
 
-    for(int i = 0; i < n_images; i++){
-        populate_matrix_from_file(filenames[i].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
-    }
+    populate_matrix_from_file(filenames[0].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
+    populate_matrix_from_file(filenames[1].c_str(), matrix_to_be_merged, center_y, center_x, cell_dim, num_rows, num_cols);
 
-    int max = save_matrix_with_zeros(big_matrix_combined, "../data/combinated_info_points.txt", num_rows, num_cols);
+    Mat big_matrix_combined1_photo = big_matrix_combined.clone();
+    int max = save_matrix_with_zeros(big_matrix_combined1_photo, "../data/combinated_info_points_1.txt", num_rows, num_cols);
+    cv::imwrite("../data/big_matrix_image1.png", big_matrix_combined1_photo);
+
+    Mat big_matrix_combined2_photo = matrix_to_be_merged.clone();
+    max = save_matrix_with_zeros(big_matrix_combined2_photo, "../data/combinated_info_points_2.txt", num_rows, num_cols);
+    cv::imwrite("../data/big_matrix_image2.png", big_matrix_combined2_photo);
+
+    if(check_matrix(big_matrix_combined, matrix_to_be_merged, num_rows, num_cols, e)){
+        populate_matrix_from_file(filenames[1].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
+        cout << "Images merged" << endl;
+    }
+    else{
+        cout << "Images too diferent to be merged" << endl;
+    }
+    
+
+    max = save_matrix_with_zeros(big_matrix_combined, "../data/combinated_info_points.txt", num_rows, num_cols);
    
     cv::imwrite("../data/big_matrix_image.png", big_matrix_combined);
 

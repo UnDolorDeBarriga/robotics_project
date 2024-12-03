@@ -435,12 +435,13 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
  * @return Eigen::Matrix4d The resulting 4x4 transformation matrix.
  */
 Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_angle){
-    Matrix4d Rx = rotation_matrix(1, -90 - camera_angle[0]);
-    Matrix4d Ry = rotation_matrix(2, -camera_angle[1]);
-    Matrix4d Rz = rotation_matrix(3, -camera_angle[2]);
+    Matrix4d Rotatey_z = rotation_matrix(1, -90);
+    Matrix4d Rx = rotation_matrix(1, camera_angle[0]);
+    Matrix4d Ry = rotation_matrix(2, camera_angle[1]);
+    Matrix4d Rz = rotation_matrix(3, camera_angle[2]);
 
-    Matrix4d T= translation_matrix(-camera_position[0], -camera_position[1], -camera_position[2]);
-    Matrix4d M = T * Rz * Ry *Rx;
+    Matrix4d T= translation_matrix(camera_position[0], camera_position[1], camera_position[2]);
+    Matrix4d M = Rotatey_z * Rz * Ry *Rx * T;
     return M;
 }
 
@@ -477,6 +478,7 @@ void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int cen
     // Ignore the first two lines
     getline(file, line);
     getline(file, line);
+    int err = 0;
     while (getline(file, line)) {
         istringstream iss(line);
         double x, y, z;
@@ -487,7 +489,6 @@ void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int cen
         }
         col = center_point_col + static_cast<int>(floor(x / cell_dim));
         row = center_point_row - static_cast<int>(floor(y / cell_dim));
-
 
         if (row >= 0 && row <= n_rows && col >= 0 && col <= n_cols) {
             z_value = static_cast<int>(round(z));
@@ -515,7 +516,7 @@ void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int cen
  * @param n_cols The number of columns in the matrix.
  * @return The maximum value found in the matrix.
  */
-int save_matrix_with_zeros(cv::Mat& mat, const std::string& filename, int n_rows, int n_cols) {
+int save_matrix_with_zeros(Mat& mat, const std::string& filename, int n_rows, int n_cols) {
     std::ofstream file(filename);
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
@@ -545,7 +546,38 @@ int save_matrix_with_zeros(cv::Mat& mat, const std::string& filename, int n_rows
 }
 
 
-
+/**
+ * @brief Compares two matrices and checks if the average root of the squared differences 
+ *        of their non-zero elements is less than a given threshold.
+ * 
+ * @param matrix1 The first matrix to compare (cv::Mat).
+ * @param matrix2 The second matrix to compare (cv::Mat).
+ * @param n_rows The number of rows in the matrices.
+ * @param n_cols The number of columns in the matrices.
+ * @param e The threshold value for comparison.
+ * @return true if the average root of the squared differences is less than the threshold, false otherwise.
+ */
+bool check_matrix(Mat& matrix1, Mat& matrix2, int n_rows, int n_cols, int e) {
+    int n = 0, temp_val1 = 0, temp_val2 = 0;
+    int squared_sum = 0;
+    for (int i = 0; i < n_rows; i++) {
+        for (int j = 0; j < n_cols; j++) {
+            temp_val1 = matrix1.at<uchar>(i, j);
+            temp_val2 = matrix2.at<uchar>(i, j);
+            if(temp_val1 != 0 && temp_val2 != 0) {
+                n += 1;
+                squared_sum += std::abs(std::pow(temp_val1,2) - std::pow(temp_val2,2));
+                //cout << "Value original: " << temp_val1 << " Value transformed: " << temp_val2 << endl;
+            }
+        }
+    }
+    squared_sum = std::sqrt(squared_sum);
+    cout << "Squared sum: " << squared_sum/n << " Error: " << e << endl;
+    if(squared_sum/n < e){
+        return true;
+    }
+    return false;
+}
 
 
 #if False

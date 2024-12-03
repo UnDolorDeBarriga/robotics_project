@@ -39,7 +39,8 @@ Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_
 
 
 void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int center_point_row, int center_point_col, int cell_dim, int n_rows, int n_cols);
-int save_matrix_with_zeros(cv::Mat& mat, const std::string& filename, int n_rows, int n_cols);
+bool check_matrix(Mat& matrix1, Mat& matrix2, int n_rows, int n_cols, int e);
+int save_matrix_with_zeros(Mat& mat, const std::string& filename, int n_rows, int n_cols);
 
 #if false
 MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col);
