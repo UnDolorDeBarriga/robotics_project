@@ -1,3 +1,7 @@
 /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/main.dir
+/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/calibration.dir
+/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/build_all.dir
+/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/build_main.dir
+/home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/build_calibration.dir
 /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/edit_cache.dir
 /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/rebuild_cache.dir

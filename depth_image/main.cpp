@@ -1,21 +1,22 @@
 #include "resources.h"
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <chrono>
-#include <thread>
+// #include <stdlib.h>
+// #include <stdint.h>
+// #include <stdio.h>
+// #include <chrono>
+// #include <thread>
+
 
 // Main function
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        printf("Usage: %s <number of images that are going to be computed> <maximum distance(m)> <number of frames> <cell discretization(mm)>\n", argv[0]);
+    if (argc != 6) {
+        printf("Usage: %s <number of images that are going to be computed> <minimum distance(m)> <maximum distance(m)> <number of frames> <cell discretization(mm)>\n", argv[0]);
         return EXIT_FAILURE;
     }
     int n_images = atoi(argv[1]);
-    int max_dist = atoi(argv[2]);
-    int n_index = atoi(argv[3]);
-    int cell_dim = atoi(argv[4]);
-    int max_depth = max_dist * 1000;  // Convert max distance to millimeters
+    int min_dist = atoi(argv[2]);
+    int max_dist = atoi(argv[3]);
+    int n_index = atoi(argv[4]);
+    int cell_dim = atoi(argv[5]);
 
     double maxAbsX=0;
     double maxAbsY=0;
@@ -34,77 +35,33 @@ int main(int argc, char *argv[]) {
     if (!dev) {
         printf("No device found.\n");
         return EXIT_FAILURE;
-    }
-    else {
+    } else {
+        #if DEBUG
         printf("Device found.\n");
+        #endif
     }
 
     // Get depth intrinsics
     rs2_intrinsics intrinsics;
+    
     
     for (int image_n = 0; image_n < n_images; image_n++) {
         // Reinitialize OpenCV matrices to accumulate depth data
         Mat accumulated_depth = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         Mat valid_pixel_count = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         
-        for (int frame_count = 0; frame_count < n_index; ++frame_count) {
-            // Wait for the next set of frames
-            frameset frames = pipeline.wait_for_frames();
-            depth_frame depth_frame = frames.get_depth_frame();
-            intrinsics = depth_frame.get_profile().as<video_stream_profile>().get_intrinsics();
-
-            Mat depth_data = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
-
-            // Normalize depth values to max distance (in millimeters)
-            for (int i = 0; i < WIDTH; i++){
-                for (int j = 0; j < HEIGHT; j++){
-                    float depth = depth_frame.get_distance(i, j);
-                    if (depth >= 0) {
-                        if (depth >= max_depth) {
-                            depth_data.at<float>(j, i) = max_depth;
-                        }
-                        else {
-                            depth_data.at<float>(j, i) = depth * 1000;  // Convert depth to millimeters
-                        }
-                        valid_pixel_count.at<int>(j, i) += 1;
-                    }
-                    else {
-                        depth_data.at<float>(j, i) = 0;  // Set out-of-range depth to 0
-                    }
-                }
-            }
-            // Accumulate depth data
-            accumulated_depth += depth_data;
-        }
+        intrinsics = get_main_frames_count(pipeline, n_index, accumulated_depth, valid_pixel_count, min_dist, max_dist);
+        //aqui va too       
 
         char i_filename[100];
         sprintf(i_filename, "../data/camera_points_image%d.txt", image_n);
         char o_filename[100];
         sprintf(o_filename, "../data/reference_points_image%d.txt", image_n);
         filenames.push_back(o_filename);
-    
-        // Compute the mean depth image
-        get_mean_depth(accumulated_depth, valid_pixel_count);
-        
-        // Write the depth data to a CSV file
-        write_depth_to_csv(accumulated_depth, n_index, image_n);
-        
-        // Deproject the mean depth image into 3D points
-        auto points_image = deproject_depth_to_3d(i_filename, accumulated_depth, intrinsics, image_n);
+        char pos_filename[100];
+        sprintf(pos_filename, "../position_camera.txt");
 
-        // Write the mean depth image to a PNG file
-        write_depth_to_image(accumulated_depth, max_depth, n_index, image_n);
-        
-        // Get the user points for the camera position and angle
-        Vector3f camera_position;
-        Vector3f camera_angle;
-        //get_user_points(image_n, camera_position, camera_angle);
-        camera_position = Vector3f(0.0, 0.0, 0.0);
-        camera_angle = Vector3f(0.0, 0.0, 0.0);
-
-        Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
-
-        transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY);
+        write_data_to_files(n_index, image_n, i_filename, o_filename, pos_filename, accumulated_depth, valid_pixel_count, intrinsics,min_dist, max_dist, maxAbsX, maxAbsY);
 
         // Wait for a keyboard input
         if (image_n != n_images-1) {
@@ -114,22 +71,56 @@ int main(int argc, char *argv[]) {
             printf("Image %d done.\n", image_n);
         }
     }
+    // Stop the pipeline
+    pipeline.stop();
     
-    MatrixXd big_ass_matrix_combined = create_matrix(maxAbsX, maxAbsY, cell_dim, center_y, center_x);
-    vector<MatrixXd> matrices = {};
-    for(int i = 0; i < n_images; i++){
-        matrices.push_back(MatrixXd::Zero(big_ass_matrix_combined.rows(), big_ass_matrix_combined.cols()));
-        populate_matrix_from_file(filenames[i].c_str(), matrices[i], center_y, center_x, cell_dim);
+    int num_rows = (ceil((maxAbsY) / cell_dim))+1;
+    int num_cols = (ceil((2 * maxAbsX) / cell_dim))+1;
+    
+    center_y = num_rows;
+    center_x = num_cols / 2;
+
+    int e = 20;
+
+    Mat big_matrix_combined = Mat::zeros(num_rows, num_cols, CV_8UC1);
+    Mat matrix_to_be_merged = Mat::zeros(num_rows, num_cols, CV_8UC1);
+
+    cout << "Num Cols: " << num_cols << endl;
+    cout << "Num Rows: " << num_rows << endl;
+
+    populate_matrix_from_file(filenames[0].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
+    populate_matrix_from_file(filenames[1].c_str(), matrix_to_be_merged, center_y, center_x, cell_dim, num_rows, num_cols);
+
+    Mat big_matrix_combined1_photo = big_matrix_combined.clone();
+    int max = save_matrix_with_zeros(big_matrix_combined1_photo, "../data/combinated_info_points_1.txt", num_rows, num_cols);
+    cv::imwrite("../data/big_matrix_image1.png", big_matrix_combined1_photo);
+
+    Mat big_matrix_combined2_photo = matrix_to_be_merged.clone();
+    max = save_matrix_with_zeros(big_matrix_combined2_photo, "../data/combinated_info_points_2.txt", num_rows, num_cols);
+    cv::imwrite("../data/big_matrix_image2.png", big_matrix_combined2_photo);
+
+    if(check_matrix(big_matrix_combined, matrix_to_be_merged, num_rows, num_cols, e)){
+        populate_matrix_from_file(filenames[1].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
+        cout << "Images merged" << endl;
     }
+    else{
+        cout << "Images too diferent to be merged" << endl;
+    }
+    
+
+    max = save_matrix_with_zeros(big_matrix_combined, "../data/combinated_info_points.txt", num_rows, num_cols);
+   
+    cv::imwrite("../data/big_matrix_image.png", big_matrix_combined);
 
     return 0;
 
-    printf("N Rows: %d\n", big_ass_matrix_combined.rows());
-    printf("N Cols: %d\n", big_ass_matrix_combined.cols());
-    //cout << matrices[0];
+    // Eigen::SparseMatrix<double> big_ass_sparse_matrix_combined;
+    // big_ass_sparse_matrix_combined.resize(ceil((2 * maxAbsY) / cell_dim) + 1, ceil((2 * maxAbsX) / cell_dim) + 1);
+    // printf("2");
 
+    // for (const auto& filename : filenames) {
+    //     populate_sparse_matrix_from_file(filename.c_str(), big_ass_sparse_matrix_combined, center_y, center_x, cell_dim);
+    // }
 
-    // Stop the pipeline
-    pipeline.stop();
     return 0;
 }

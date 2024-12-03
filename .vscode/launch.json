@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Debug DepthImageProcessing",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/main", // Path to your executable
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "CMake Build", // Task to build your project before debugging
+            "miDebuggerPath": "/usr/bin/gdb", // Path to gdb
+            "logging": {
+                "engineLogging": true
+            }
+        }
+    ]
+}
