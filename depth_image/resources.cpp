@@ -411,12 +411,14 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
         getline(ss, temp, ',');
         vec(2) = stod(temp);
         vec=M*vec;
-        myout << vec(0) << "," << vec(1) << "," << vec(2) << endl;
-        if(std::abs(vec(0))>maxAbsX){
-            maxAbsX = std::abs(vec(0));
-        }
-        if(std::abs(vec(1)) > maxAbsY){
-            maxAbsY = std::abs(vec(1));
+        if (vec(1) >= 0){
+            myout << vec(0) << "," << vec(1) << "," << vec(2) << endl;
+            if(std::abs(vec(0))>maxAbsX){
+                maxAbsX = std::abs(vec(0));
+            }
+            if(std::abs(vec(1)) > maxAbsY){
+                maxAbsY = std::abs(vec(1));
+            }
         }
     }
     myin.close();
