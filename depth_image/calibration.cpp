@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     int max_dist = atoi(argv[1]);
     int n_index = atoi(argv[2]);
     int dist = atoi(argv[3]);
-    int dist_m = round(dist/1000);
+    int dist_cm = round(dist/10);
 
     double maxAbsX=0;
     double maxAbsY=0;
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
     // Write the depth data to a CSV file
     char filename[50];
-    sprintf(filename, "../data_calibration/mean_depth_%dm.csv", dist_m);
+    sprintf(filename, "../data_calibration/mean_depth_%dcm.csv", dist_cm);
     ofstream csv_file(filename);
     if (!csv_file.is_open()) {
         printf("Failed to open the CSV file.\n");
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
     average_depth.convertTo(mean_depth_image, CV_8UC1, 255.0 / (max_dist*1000), -255.0 / (max_dist*1000));
     Mat depth_color;
     applyColorMap(mean_depth_image, depth_color, COLORMAP_JET);
-    sprintf(filename, "../data_calibration/mean_depth_%dm.png",dist_m);
+    sprintf(filename, "../data_calibration/mean_depth_%dcm.png",dist_cm);
     imwrite(filename, depth_color);
 
     // Save the mean and standard deviation to a file
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
         printf("Failed to open the stats file.\n");
         return 0;
     }
-    stats_file << "Dist: " << dist << " mm, Averaged in " <<  n_index << " frames\n";
+    stats_file << "Dist: " << dist_cm << " cm, Averaged in " <<  n_index << " frames\n";
     stats_file << "Average: " << average_depth_center << " mm\n";
     stats_file << "Stdd: " << standard_deviation << " mm\n";
     stats_file << endl;

@@ -1,12 +1,83 @@
-Dist: 942 mm, Averaged in 500 frames
-Average: 947 mm
-Stdd: 4 mm
+Dist: 100 cm, Averaged in 500 frames
+Average: 1088 mm
+Stdd: 15 mm
 
-Dist: 1874 mm, Averaged in 500 frames
-Average: 1936 mm
-Stdd: 13 mm
+Dist: 200 cm, Averaged in 500 frames
+Average: 1938 mm
+Stdd: 28 mm
 
-Dist: 286 mm, Averaged in 500 frames
-Average: 2953 mm
-Stdd: 8 mm
+Dist: 300 cm, Averaged in 700 frames
+Average: 2701 mm
+Stdd: 43 mm
+
+Dist: 400 cm, Averaged in 700 frames
+Average: 3940 mm
+Stdd: 143 mm
+
+Dist: 500 cm, Averaged in 1000 frames
+Average: 4925 mm
+Stdd: 183 mm
+
+Dist: 600 cm, Averaged in 1000 frames
+Average: 6225 mm
+Stdd: 250 mm
+
+Dist: 700 cm, Averaged in 1000 frames
+Average: 7323 mm
+Stdd: 307 mm
+
+Dist: 800 cm, Averaged in 1000 frames
+Average: 7846 mm
+Stdd: 375 mm
+
+Dist: 900 cm, Averaged in 1000 frames
+Average: 8704 mm
+Stdd: 171 mm
+
+Dist: 1000 cm, Averaged in 1000 frames
+Average: 9811 mm
+Stdd: 300 mm
+
+Second Try
+
+
+Dist: 110 cm, Averaged in 1000 frames
+Average: 1098 mm
+Stdd: 23 mm
+
+Dist: 210 cm, Averaged in 1000 frames
+Average: 2054 mm
+Stdd: 38 mm
+
+Dist: 310 cm, Averaged in 1000 frames
+Average: 2892 mm
+Stdd: 79 mm
+
+Dist: 410 cm, Averaged in 1000 frames
+Average: 3894 mm
+Stdd: 53 mm
+
+Dist: 510 cm, Averaged in 1000 frames
+Average: 5002 mm
+Stdd: 74 mm
+
+Dist: 610 cm, Averaged in 1000 frames
+Average: 6178 mm
+Stdd: 91 mm
+
+Dist: 710 cm, Averaged in 1000 frames
+Average: 6899 mm
+Stdd: 137 mm
+
+Dist: 810 cm, Averaged in 1000 frames
+Average: 8159 mm
+Stdd: 265 mm
+
+Dist: 910 cm, Averaged in 1000 frames
+Average: 9052 mm
+Stdd: 215 mm
+
+Dist: 1010 cm, Averaged in 1000 frames
+Average: 9827 mm
+Stdd: 253 mm
 
