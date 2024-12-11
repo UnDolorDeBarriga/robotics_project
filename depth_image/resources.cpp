@@ -50,6 +50,44 @@ rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumu
     return intrinsics;
 }
 
+
+
+/**
+ * @brief Deprojects the depth matrix into 3D points.
+ * 
+ * @param i_filename The input file name to save the 3D coordinates.
+ * @param depth_matrix The depth matrix data.
+ * @param intrinsics The camera intrinsics.
+ * @param image_n The image number.
+ * @param min_dist The minimum distance for depth values (in meters).
+ * @param max_dist The maximum distance for depth values (in meters).
+ * @return std::vector<Eigen::Vector3f> The 3D points.
+ */
+vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n, int min_dist, int max_dist) {
+    vector<Eigen::Vector3f> points;
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            float depth = depth_matrix.at<float>(y, x);
+            if (depth > (min_dist*1000) && depth < (max_dist*1000)) {
+                float point[3];
+                float pixel[2] = { static_cast<float>(x), static_cast<float>(y) };
+                rs2_deproject_pixel_to_point(point, &intrinsics, pixel, depth);
+                points.emplace_back(point[0], point[1], point[2]);
+            }
+        }
+    }
+    ofstream points_file(i_filename);
+    for (const auto& point : points) {
+        points_file << point[0] << "," << point[1] << "," << point[2] << "\n";
+    }
+    points_file.close();
+    return points;
+}
+
+
+
+
+
 /**
  * @brief Writes depth data to files and performs transformation.
  *
@@ -72,40 +110,38 @@ rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumu
  */
 void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], const char pos_filename[],
                          Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int min_dist, int max_dist, 
-                         double& maxAbsX, double& maxAbsY) {
+                         double& maxAbsX, double& maxAbsY, Vector3f& camera_position, Vector3f& camera_angle) {
 
     // Compute the mean depth image
     Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count, max_dist);
-#if DEBUG
+    #if DEBUG
     printf("Computed mean depth for image %d\n", image_n);
-#endif
+    #endif
 
     // Write the depth data to a CSV file
     write_depth_to_csv(average_depth, n_index, image_n);
-#if DEBUG
+    #if DEBUG
     printf("Wrote depth data to CSV for image %d\n", image_n);
-#endif
+    #endif
 
     // Deproject the mean depth image into 3D points
     auto points_image = deproject_depth_to_3d(i_filename, average_depth, intrinsics, image_n, min_dist, max_dist);
-#if DEBUG
+    #if DEBUG
     printf("Deprojected depth to 3D for image %d\n", image_n);
-#endif
+    #endif
 
     // Write the mean depth image to a PNG file
     write_depth_to_image(average_depth, (max_dist*1000), n_index, image_n);
-#if DEBUG
+    #if DEBUG
     printf("Wrote depth image to PNG for image %d\n", image_n);
-#endif
+    #endif
     // Get the user points for the camera position and angle
-    Vector3f camera_position, camera_angle;
-    
     //get_user_points_input(image_n, camera_position, camera_angle);
     get_user_points_file(pos_filename, image_n, camera_position, camera_angle);
-#if DEBUG
+    #if DEBUG
     cout << "Camera Position: " << camera_position.transpose() << endl;
     cout << "Camera Angle: " << camera_angle.transpose() << endl;
-#endif
+    #endif
 
     Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
 #if DEBUG
@@ -170,38 +206,6 @@ void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n) {
     }
     csv_file.close();
     return;
-}
-
-/**
- * @brief Deprojects the depth matrix into 3D points.
- * 
- * @param i_filename The input file name to save the 3D coordinates.
- * @param depth_matrix The depth matrix data.
- * @param intrinsics The camera intrinsics.
- * @param image_n The image number.
- * @param min_dist The minimum distance for depth values (in meters).
- * @param max_dist The maximum distance for depth values (in meters).
- * @return std::vector<Eigen::Vector3f> The 3D points.
- */
-vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n, int min_dist, int max_dist) {
-    vector<Eigen::Vector3f> points;
-    for (int y = 0; y < HEIGHT; ++y) {
-        for (int x = 0; x < WIDTH; ++x) {
-            float depth = depth_matrix.at<float>(y, x);
-            if (depth > (min_dist*1000) && depth < (max_dist*1000)) {
-                float point[3];
-                float pixel[2] = { static_cast<float>(x), static_cast<float>(y) };
-                rs2_deproject_pixel_to_point(point, &intrinsics, pixel, depth);
-                points.emplace_back(point[0], point[1], point[2]);
-            }
-        }
-    }
-    ofstream points_file(i_filename);
-    for (const auto& point : points) {
-        points_file << point[0] << "," << point[1] << "," << point[2] << "\n";
-    }
-    points_file.close();
-    return points;
 }
 
 /**
@@ -580,119 +584,3 @@ bool check_matrix(Mat& matrix1, Mat& matrix2, int n_rows, int n_cols, int e) {
     }
     return false;
 }
-
-
-#if False
-
-/**
- * @brief Creates a matrix with specified dimensions and calculates the center point.
- *
- * This function generates a matrix of zeros with dimensions based on the provided
- * maximum absolute values for X and Y coordinates and the cell dimension. It also
- * calculates the center point of the matrix, which corresponds to the origin (x = 0, y = 0).
- *
- * @param maxAbsX The maximum absolute value for the X coordinate.
- * @param maxAbsY The maximum absolute value for the Y coordinate.
- * @param cell_dim The dimension of each cell in the matrix.
- * @param center_point_row Reference to an integer where the row index of the center point will be stored.
- * @param center_point_col Reference to an integer where the column index of the center point will be stored.
- * @return MatrixXd A matrix of zeros with the calculated dimensions.
- */
-MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col) {
-    int num_rows = ceil((2 * maxAbsY) / cell_dim);
-    int num_cols = ceil((2 * maxAbsX) / cell_dim);
-    MatrixXd z_matrix = MatrixXd::Zero(num_rows+1, num_cols+1);
-
-    // Determine the center point in the matrix (corresponding to x = 0, y = 0)
-    center_point_row = num_rows / 2;
-    center_point_col = num_cols / 2;
-    return z_matrix;
-}
-
-/**
- * @brief Populates a matrix from a file containing 3D coordinates.
- * 
- * This function reads 3D coordinates from an input file and populates a matrix with the z-values.
- * The matrix is centered around a specified center point, and the coordinates are scaled based on the cell dimension.
- * 
- * @param i_filename The path to the input file containing 3D coordinates.
- * @param matrix The matrix to be populated with z-values.
- * @param center_point_row The row index of the center point in the matrix.
- * @param center_point_col The column index of the center point in the matrix.
- * @param cell_dim The dimension of each cell in the matrix.
- */
-void populate_matrix_from_file_old(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim) {
-    ifstream file(i_filename);
-    if (!file.is_open()) {
-        cerr << "Error opening file!" << endl;
-        return;
-    }
-    int row, col;
-    string line;
-    while (getline(file, line)) {
-        istringstream iss(line);
-        double x, y, z;
-        char comma1, comma2;
-        if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
-            cerr << "Invalid line format: " << line << endl;
-            continue;
-        }
-
-        col = center_point_col + static_cast<int>(floor(x / cell_dim));
-        row = center_point_row - static_cast<int>(floor(y / cell_dim));
- 
-
-        if (row >= 0 && row < matrix.rows() && col >= 0 && col < matrix.cols()) {
-            matrix(row, col) = static_cast<int>(round(z)); // Assign the z value to the appropriate cell
-        } else {
-            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: "<< row <<" col: " <<col<<")" << endl;
-        }
-    }
-    file.close();
-    return;
-}
-
-/**
- * @brief Populates a sparse matrix from a file containing 3D coordinates.
- * 
- * This function reads 3D coordinates from an input file and populates a sparse matrix with the z-values.
- * The matrix is centered around a specified center point, and the coordinates are scaled based on the cell dimension.
- * 
- * @param i_filename The path to the input file containing 3D coordinates.
- * @param matrix The sparse matrix to be populated with z-values.
- * @param center_point_row The row index of the center point in the matrix.
- * @param center_point_col The column index of the center point in the matrix.
- * @param cell_dim The dimension of each cell in the matrix.
- */
-void populate_sparse_matrix_from_file(const char i_filename[], Eigen::SparseMatrix<double>& matrix, int center_point_row, int center_point_col, int cell_dim) {
-    ifstream file(i_filename);
-    if (!file.is_open()) {
-        cerr << "Error opening file!" << endl;
-        return;
-    }
-    int row, col;
-    string line;
-    while (getline(file, line)) {
-        istringstream iss(line);
-        double x, y, z;
-        char comma1, comma2;
-        if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
-            cerr << "Invalid line format: " << line << endl;
-            continue;
-        }
-
-        col = center_point_col + static_cast<int>(floor(x / cell_dim));
-        row = center_point_row - static_cast<int>(floor(y / cell_dim));
-
-        if (row >= 0 && row < matrix.rows() && col >= 0 && col < matrix.cols()) {
-            matrix.coeffRef(row, col) = static_cast<int>(round(z)); // Assign the z value to the appropriate cell
-        } else {
-            cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: "<< row <<" col: " <<col<<")" << endl;
-        }
-    }
-    file.close();
-    return;
-}
-
-
-#endif
