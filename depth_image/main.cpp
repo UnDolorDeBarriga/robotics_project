@@ -21,6 +21,8 @@ int main(int argc, char *argv[]) {
     double maxAbsX=0;
     double maxAbsY=0;
 
+    Vector3f o_camera_position, o_camera_angle = Vector3f::Zero();
+
     int center_x;
     int center_y;
 
@@ -44,6 +46,16 @@ int main(int argc, char *argv[]) {
     // Get depth intrinsics
     rs2_intrinsics intrinsics;
     
+
+    // TODO:
+        // Camera points Combinated image 1 header -> Position of the camera
+        // Camera points Combinated image n header -> Points of the camera in n
+        // Camera points Combinated big -> image 1 and calibration data
+            // calib 1 x [1088, 1938, 2701, 3940, 4925, 6225, 7323, 7846, 8704, 9811]
+            // calib 1 y [15,   28,   43,   143,  183,  250,  307,  375,  171,  300]
+            // calib 2 x [1098, 2054, 2892, 3894, 5002, 6178, 6899, 8159, 9052, 9827]
+            // calib 2 y [23,   38,   79,   53,   74,   91,   137,  265,  215,  253]
+
     
     for (int image_n = 0; image_n < n_images; image_n++) {
         // Reinitialize OpenCV matrices to accumulate depth data
@@ -60,9 +72,12 @@ int main(int argc, char *argv[]) {
         filenames.push_back(o_filename);
         char pos_filename[100];
         sprintf(pos_filename, "../position_camera.txt");
-
-        write_data_to_files(n_index, image_n, i_filename, o_filename, pos_filename, accumulated_depth, valid_pixel_count, intrinsics,min_dist, max_dist, maxAbsX, maxAbsY);
-
+        Vector3f camera_position, camera_angle = Vector3f::Zero();
+        write_data_to_files(n_index, image_n, i_filename, o_filename, pos_filename, accumulated_depth, valid_pixel_count, intrinsics,min_dist, max_dist, maxAbsX, maxAbsY, camera_position, camera_angle);
+        if (image_n == 0) {
+            o_camera_position = camera_position;
+            o_camera_angle = camera_angle;
+        }
         // Wait for a keyboard input
         if (image_n != n_images-1) {
             printf("Image %d done.\nPress any key to continue...\n", image_n);
