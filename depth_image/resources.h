@@ -14,6 +14,8 @@
 #define HEIGHT 480
 #define FPS 30
 
+#define ERROR 20
+
 #define DEBUG 1
 
 using namespace Eigen;

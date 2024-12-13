@@ -96,46 +96,41 @@ int main(int argc, char *argv[]) {
     center_x = num_cols / 2;
 
     int e = 20;
-
-    Mat big_matrix_combined = Mat::zeros(num_rows, num_cols, CV_8UC1);
-    Mat matrix_to_be_merged = Mat::zeros(num_rows, num_cols, CV_8UC1);
-
     cout << "Num Cols: " << num_cols << endl;
     cout << "Num Rows: " << num_rows << endl;
 
+    Mat big_matrix_combined = Mat::zeros(num_rows, num_cols, CV_8UC1);
+
     populate_matrix_from_file(filenames[0].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
-    populate_matrix_from_file(filenames[1].c_str(), matrix_to_be_merged, center_y, center_x, cell_dim, num_rows, num_cols);
-
     Mat big_matrix_combined1_photo = big_matrix_combined.clone();
-    int max = save_matrix_with_zeros(big_matrix_combined1_photo, "../data/combinated_info_points_1.txt", num_rows, num_cols);
-    cv::imwrite("../data/big_matrix_image1.png", big_matrix_combined1_photo);
-
-    Mat big_matrix_combined2_photo = matrix_to_be_merged.clone();
-    max = save_matrix_with_zeros(big_matrix_combined2_photo, "../data/combinated_info_points_2.txt", num_rows, num_cols);
-    cv::imwrite("../data/big_matrix_image2.png", big_matrix_combined2_photo);
-
-    if(check_matrix(big_matrix_combined, matrix_to_be_merged, num_rows, num_cols, e)){
-        populate_matrix_from_file(filenames[1].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
-        cout << "Images merged" << endl;
-    }
-    else{
-        cout << "Images too diferent to be merged" << endl;
-    }
+    int max = save_matrix_with_zeros(big_matrix_combined1_photo, "../data/deprojected_points0.txt", num_rows, num_cols);
+    cv::imwrite("../data/big_matrix_image0.png", big_matrix_combined1_photo);
     
+    Mat matrix_to_be_merged;
+    char deprojected_filename[100];
+    for(int n_image = 1; n_image < n_images; n_image++){
+        matrix_to_be_merged = Mat::zeros(num_rows, num_cols, CV_8UC1);
+        populate_matrix_from_file(filenames[n_image].c_str(), matrix_to_be_merged, center_y, center_x, cell_dim, num_rows, num_cols);
+        Mat big_matrix_combined2_photo = matrix_to_be_merged.clone();
+        sprintf(deprojected_filename, "../data/deprojected_points%d.txt", n_image);
+        max = save_matrix_with_zeros(big_matrix_combined2_photo, deprojected_filename, num_rows, num_cols);
+
+        sprintf(deprojected_filename, "../data/big_matrix_image%d.png", n_image);
+        cv::imwrite(deprojected_filename, big_matrix_combined2_photo);
+        
+
+        if(check_matrix(big_matrix_combined, matrix_to_be_merged, num_rows, num_cols, e)){
+            populate_matrix_from_file(filenames[n_image].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
+            cout << "Image " << n_image << " merged" << endl;
+        }
+        else{
+            cout << "Images too diferent to be merged" << endl;
+        }
+    }
+    //for next future
 
     max = save_matrix_with_zeros(big_matrix_combined, "../data/combinated_info_points.txt", num_rows, num_cols);
-   
     cv::imwrite("../data/big_matrix_image.png", big_matrix_combined);
-
-    return 0;
-
-    // Eigen::SparseMatrix<double> big_ass_sparse_matrix_combined;
-    // big_ass_sparse_matrix_combined.resize(ceil((2 * maxAbsY) / cell_dim) + 1, ceil((2 * maxAbsX) / cell_dim) + 1);
-    // printf("2");
-
-    // for (const auto& filename : filenames) {
-    //     populate_sparse_matrix_from_file(filename.c_str(), big_ass_sparse_matrix_combined, center_y, center_x, cell_dim);
-    // }
 
     return 0;
 }

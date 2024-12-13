@@ -500,7 +500,9 @@ void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int cen
         if (row >= 0 && row <= n_rows && col >= 0 && col <= n_cols) {
             z_value = static_cast<int>(round(z));
             if(matrix.at<uchar>(row, col) < z_value || matrix.at<uchar>(row, col) == 0){
-                matrix.at<uchar>(row, col) = z_value;
+                if(z_value >= ERROR){
+                    matrix.at<uchar>(row, col) = z_value;
+                }
             }
         } else {
             cerr << "Coordinates (" << x << ", " << y << ") out of matrix bounds. (row: " << row << " col: " << col << ")" << endl;
