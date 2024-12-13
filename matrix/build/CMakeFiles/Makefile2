@@ -54,10 +54,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/arnau/Desktop/robotics_project/matrix
+CMAKE_SOURCE_DIR = /home/pi/Desktop/robotics_project/matrix
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/arnau/Desktop/robotics_project/matrix/build
+CMAKE_BINARY_DIR = /home/pi/Desktop/robotics_project/matrix/build
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -85,14 +85,14 @@ clean: CMakeFiles/build_better.dir/clean
 CMakeFiles/matrix.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/matrix.dir/build.make CMakeFiles/matrix.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num=4,5,6 "Built target matrix"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num=4,5,6 "Built target matrix"
 .PHONY : CMakeFiles/matrix.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/matrix.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Desktop/robotics_project/matrix/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/matrix.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Desktop/robotics_project/matrix/build/CMakeFiles 0
 .PHONY : CMakeFiles/matrix.dir/rule
 
 # Convenience name for target.
@@ -111,14 +111,14 @@ CMakeFiles/matrix.dir/clean:
 CMakeFiles/better.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/better.dir/build.make CMakeFiles/better.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/better.dir/build.make CMakeFiles/better.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num=1,2,3 "Built target better"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num=1,2,3 "Built target better"
 .PHONY : CMakeFiles/better.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/better.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Desktop/robotics_project/matrix/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/better.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Desktop/robotics_project/matrix/build/CMakeFiles 0
 .PHONY : CMakeFiles/better.dir/rule
 
 # Convenience name for target.
@@ -137,14 +137,14 @@ CMakeFiles/better.dir/clean:
 CMakeFiles/build_matrix.dir/all: CMakeFiles/matrix.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_matrix.dir/build.make CMakeFiles/build_matrix.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_matrix.dir/build.make CMakeFiles/build_matrix.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num= "Built target build_matrix"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num= "Built target build_matrix"
 .PHONY : CMakeFiles/build_matrix.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/build_matrix.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Desktop/robotics_project/matrix/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/build_matrix.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Desktop/robotics_project/matrix/build/CMakeFiles 0
 .PHONY : CMakeFiles/build_matrix.dir/rule
 
 # Convenience name for target.
@@ -163,14 +163,14 @@ CMakeFiles/build_matrix.dir/clean:
 CMakeFiles/build_better.dir/all: CMakeFiles/better.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_better.dir/build.make CMakeFiles/build_better.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_better.dir/build.make CMakeFiles/build_better.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num= "Built target build_better"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles --progress-num= "Built target build_better"
 .PHONY : CMakeFiles/build_better.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/build_better.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Desktop/robotics_project/matrix/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/build_better.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pi/Desktop/robotics_project/matrix/build/CMakeFiles 0
 .PHONY : CMakeFiles/build_better.dir/rule
 
 # Convenience name for target.

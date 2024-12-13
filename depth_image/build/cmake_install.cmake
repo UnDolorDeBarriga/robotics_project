@@ -1,4 +1,4 @@
-# Install script for directory: /home/arnau/Desktop/robotics_project/depth_image
+# Install script for directory: /home/pi/Desktop/robotics_project/depth_image
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/arnau/Desktop/robotics_project/depth_image/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/pi/Desktop/robotics_project/depth_image/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

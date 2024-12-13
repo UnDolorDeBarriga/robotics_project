@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/arnau/Desktop/robotics_project/matrix/matrici.cpp" "CMakeFiles/matrix.dir/matrici.cpp.o" "gcc" "CMakeFiles/matrix.dir/matrici.cpp.o.d"
-  "/home/arnau/Desktop/robotics_project/matrix/spatial_transf.cpp" "CMakeFiles/matrix.dir/spatial_transf.cpp.o" "gcc" "CMakeFiles/matrix.dir/spatial_transf.cpp.o.d"
+  "/home/pi/Desktop/robotics_project/matrix/matrici.cpp" "CMakeFiles/matrix.dir/matrici.cpp.o" "gcc" "CMakeFiles/matrix.dir/matrici.cpp.o.d"
+  "/home/pi/Desktop/robotics_project/matrix/spatial_transf.cpp" "CMakeFiles/matrix.dir/spatial_transf.cpp.o" "gcc" "CMakeFiles/matrix.dir/spatial_transf.cpp.o.d"
   )
 
 # Targets to which this target links.

@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/arnau/Desktop/robotics_project/matrix
+CMAKE_SOURCE_DIR = /home/pi/Desktop/robotics_project/matrix
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/arnau/Desktop/robotics_project/matrix/build
+CMAKE_BINARY_DIR = /home/pi/Desktop/robotics_project/matrix/build
 
 # Utility rule file for build_better.
 
@@ -81,6 +81,6 @@ CMakeFiles/build_better.dir/clean:
 .PHONY : CMakeFiles/build_better.dir/clean
 
 CMakeFiles/build_better.dir/depend:
-	cd /home/arnau/Desktop/robotics_project/matrix/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/arnau/Desktop/robotics_project/matrix /home/arnau/Desktop/robotics_project/matrix /home/arnau/Desktop/robotics_project/matrix/build /home/arnau/Desktop/robotics_project/matrix/build /home/arnau/Desktop/robotics_project/matrix/build/CMakeFiles/build_better.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/pi/Desktop/robotics_project/matrix/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/pi/Desktop/robotics_project/matrix /home/pi/Desktop/robotics_project/matrix /home/pi/Desktop/robotics_project/matrix/build /home/pi/Desktop/robotics_project/matrix/build /home/pi/Desktop/robotics_project/matrix/build/CMakeFiles/build_better.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/build_better.dir/depend
 

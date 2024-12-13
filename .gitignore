@@ -1,1 +1,4 @@
-depth_image/data/
+depth_image/data/*
+
+depth_image/build/*
+matrix/build/*

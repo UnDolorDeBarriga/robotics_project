@@ -23,7 +23,9 @@ using namespace cv;
 
 // Function declarations
 rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumulated_depth, Mat &valid_pixel_count, int min_dist, int max_dist);
-void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], const char pos_filename[], Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int min_dist, int max_dist, double& maxAbsX, double& maxAbsY);
+void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], const char pos_filename[],
+                         Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int min_dist, int max_dist, 
+                         double& maxAbsX, double& maxAbsY);
 
 void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n);
 vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n, int min_dist, int max_dist);
@@ -41,12 +43,6 @@ Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_
 void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int center_point_row, int center_point_col, int cell_dim, int n_rows, int n_cols);
 bool check_matrix(Mat& matrix1, Mat& matrix2, int n_rows, int n_cols, int e);
 int save_matrix_with_zeros(Mat& mat, const std::string& filename, int n_rows, int n_cols);
-
-#if false
-MatrixXd create_matrix(double maxAbsX, double maxAbsY, int cell_dim, int& center_point_row, int& center_point_col);
-void populate_matrix_from_file_old(const char i_filename[], MatrixXd& matrix, int center_point_row, int center_point_col, int cell_dim);
-void populate_sparse_matrix_from_file(const char i_filename[], Eigen::SparseMatrix<double>& matrix, int center_point_row, int center_point_col, int cell_dim);
-#endif
 
 #endif // RESOURCES_H
 

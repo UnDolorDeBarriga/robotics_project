@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
         char pos_filename[100];
         sprintf(pos_filename, "../position_camera.txt");
         Vector3f camera_position, camera_angle = Vector3f::Zero();
-        write_data_to_files(n_index, image_n, i_filename, o_filename, pos_filename, accumulated_depth, valid_pixel_count, intrinsics,min_dist, max_dist, maxAbsX, maxAbsY, camera_position, camera_angle);
+        write_data_to_files(n_index, image_n, i_filename, o_filename, pos_filename, accumulated_depth, valid_pixel_count, intrinsics,min_dist, max_dist, maxAbsX, maxAbsY);
         if (image_n == 0) {
             o_camera_position = camera_position;
             o_camera_angle = camera_angle;

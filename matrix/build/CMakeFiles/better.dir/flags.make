@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -isystem /usr/include/opencv4 -isystem /usr/include/eigen3
+CXX_INCLUDES = -isystem /usr/local/include/opencv4 -isystem /usr/include/eigen3
 
 CXX_FLAGS = 
 

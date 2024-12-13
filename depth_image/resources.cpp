@@ -110,7 +110,7 @@ vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix
  */
 void write_data_to_files(int n_index, int image_n, const char i_filename[], const char o_filename[], const char pos_filename[],
                          Mat accumulated_depth, Mat valid_pixel_count, rs2_intrinsics intrinsics, int min_dist, int max_dist, 
-                         double& maxAbsX, double& maxAbsY, Vector3f& camera_position, Vector3f& camera_angle) {
+                         double& maxAbsX, double& maxAbsY) {
 
     // Compute the mean depth image
     Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count, max_dist);
@@ -137,6 +137,7 @@ void write_data_to_files(int n_index, int image_n, const char i_filename[], cons
     #endif
     // Get the user points for the camera position and angle
     //get_user_points_input(image_n, camera_position, camera_angle);
+    Vector3f camera_position, camera_angle = Vector3f::Zero();
     get_user_points_file(pos_filename, image_n, camera_position, camera_angle);
     #if DEBUG
     cout << "Camera Position: " << camera_position.transpose() << endl;
@@ -144,13 +145,13 @@ void write_data_to_files(int n_index, int image_n, const char i_filename[], cons
     #endif
 
     Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
-#if DEBUG
+    #if DEBUG
     printf("Created transformation matrix for image %d\n", image_n);
-#endif
+    #endif
     transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY, camera_position, camera_angle);
-#if DEBUG
+    #if DEBUG
     printf("Transformed coordinates for image %d\n", image_n);
-#endif
+    #endif
     return;
 }
 

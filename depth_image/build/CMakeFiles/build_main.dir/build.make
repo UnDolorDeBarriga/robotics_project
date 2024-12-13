@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/arnau/Desktop/robotics_project/depth_image
+CMAKE_SOURCE_DIR = /home/pi/Desktop/robotics_project/depth_image
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/arnau/Desktop/robotics_project/depth_image/build
+CMAKE_BINARY_DIR = /home/pi/Desktop/robotics_project/depth_image/build
 
 # Utility rule file for build_main.
 
@@ -81,6 +81,6 @@ CMakeFiles/build_main.dir/clean:
 .PHONY : CMakeFiles/build_main.dir/clean
 
 CMakeFiles/build_main.dir/depend:
-	cd /home/arnau/Desktop/robotics_project/depth_image/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/arnau/Desktop/robotics_project/depth_image /home/arnau/Desktop/robotics_project/depth_image /home/arnau/Desktop/robotics_project/depth_image/build /home/arnau/Desktop/robotics_project/depth_image/build /home/arnau/Desktop/robotics_project/depth_image/build/CMakeFiles/build_main.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/pi/Desktop/robotics_project/depth_image/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/pi/Desktop/robotics_project/depth_image /home/pi/Desktop/robotics_project/depth_image /home/pi/Desktop/robotics_project/depth_image/build /home/pi/Desktop/robotics_project/depth_image/build /home/pi/Desktop/robotics_project/depth_image/build/CMakeFiles/build_main.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/build_main.dir/depend
 
