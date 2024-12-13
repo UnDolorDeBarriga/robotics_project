@@ -1,4 +1,8 @@
 depth_image/data/*
+!depth_image/data/.gitkeep
 
 depth_image/build/*
+!depth_image/build/.gitkeep
+
 matrix/build/*
+!matrix/build/.gitkeep
