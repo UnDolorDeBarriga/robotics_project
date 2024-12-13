@@ -1,6 +1,0 @@
-/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles/matrix.dir
-/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles/better.dir
-/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles/build_matrix.dir
-/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles/build_better.dir
-/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles/edit_cache.dir
-/home/pi/Desktop/robotics_project/matrix/build/CMakeFiles/rebuild_cache.dir
