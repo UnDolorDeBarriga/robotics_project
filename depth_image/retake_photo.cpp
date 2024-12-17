@@ -159,6 +159,7 @@ int main(int argc, char *argv[]) {
     normalizeAndInvert(big_matrix_combined, output);
     imwrite("../data/combinated_deprojected_image.png", output);
 
+    system("source ~/Desktop/robotics_project/.venv/bin/activate");
     system("python ../hystogram.py");
     return 0;
 }

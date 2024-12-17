@@ -588,7 +588,7 @@ void normalizeAndInvert(const Mat& input, Mat& output){
     normalizedFloat = (normalizedFloat - minVal) / (maxVal - minVal);
 
     normalizedFloat = 1.0 - normalizedFloat;
-
+    // Change gama value if the gray scale is not good
     cv::pow(normalizedFloat, 1.0 / 0.5, normalizedFloat);
     
     normalizedFloat *= 255.0;

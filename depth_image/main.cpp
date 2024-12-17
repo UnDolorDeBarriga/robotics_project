@@ -133,7 +133,8 @@ int main(int argc, char *argv[]) {
     save_matrix_with_zeros(big_matrix_combined, "../data/combinated_deprojected_points.txt", num_rows, num_cols, o_camera_position);
     normalizeAndInvert(big_matrix_combined, output);
     imwrite("../data/combinated_deprojected_image.png", output);
-
+    
+    system("source ~/Desktop/robotics_project/.venv/bin/activate");
     system("python ../hystogram.py");
     return 0;
 }
