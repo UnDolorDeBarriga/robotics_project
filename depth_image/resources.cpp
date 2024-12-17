@@ -519,7 +519,7 @@ void save_matrix_with_zeros(const Mat& mat, const std::string& filename, int n_r
         return;
     }
     int value;
-    // file << camera_position(0) << "," << camera_position(1) << "," << camera_position(2) << endl;
+    file << camera_position(0) << "," << camera_position(1) << "," << camera_position(2) << endl;
     for (int i = 0; i < n_rows; ++i) {
         for (int j = 0; j < n_cols; ++j) {
             value = mat.at<int>(i, j);
