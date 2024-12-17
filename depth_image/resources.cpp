@@ -512,7 +512,7 @@ Vector3f populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int
  * @param n_rows The number of rows in the matrix.
  * @param n_cols The number of columns in the matrix.
  */
-void save_matrix_with_zeros(Mat& mat, const std::string& filename, int n_rows, int n_cols, Vector3f camera_position) {
+void save_matrix_with_zeros(const Mat& mat, const std::string& filename, int n_rows, int n_cols, Vector3f camera_position) {
     std::ofstream file(filename);
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
@@ -527,9 +527,9 @@ void save_matrix_with_zeros(Mat& mat, const std::string& filename, int n_rows, i
             if (j < n_cols - 1) {
                 file << ", ";
             }
-            if(value == 0){
-                mat.at<int>(i, j) = 255;
-            }
+            // if(value == 0){
+            //     mat.at<int>(i, j) = 255;
+            // }
         }
         file << "\n";
     }
@@ -569,4 +569,30 @@ bool check_matrix(const Mat& matrix1, const Mat& matrix2, int n_rows, int n_cols
         return true;
     }
     return false;
+}
+
+
+/**
+ * @brief Normalizes and inverts a CV_32SC1 matrix for visualization.
+ *
+ * @param input The input matrix of type CV_32SC1.
+ * @param output The output matrix of type CV_8U, normalized and inverted [0 - 255].
+ */
+void normalizeAndInvert(const Mat& input, Mat& output){
+    cv::Mat normalizedFloat;
+    double minVal, maxVal;
+    minMaxLoc(input, &minVal, &maxVal);
+
+    input.convertTo(normalizedFloat, CV_32F);
+
+    normalizedFloat = (normalizedFloat - minVal) / (maxVal - minVal);
+
+    normalizedFloat = 1.0 - normalizedFloat;
+
+    cv::pow(normalizedFloat, 1.0 / 0.5, normalizedFloat);
+    
+    normalizedFloat *= 255.0;
+
+    normalizedFloat.convertTo(output, CV_8U);
+    return;
 }

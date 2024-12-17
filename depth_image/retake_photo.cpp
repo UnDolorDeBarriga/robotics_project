@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     int max_dist = atoi(argv[3]);
     int n_index = atoi(argv[4]);
     int cell_dim = atoi(argv[5]);
-    int image_to_retake = atoi(argv[5]);
+    int image_to_retake = atoi(argv[6]);
 
     double maxAbsX=0;
     double maxAbsY=0;
@@ -122,11 +122,12 @@ int main(int argc, char *argv[]) {
     Mat big_matrix_combined = Mat::zeros(num_rows, num_cols, CV_32SC1);
     o_camera_position = populate_matrix_from_file(filenames[0].c_str(), big_matrix_combined, center_y, center_x, cell_dim, num_rows, num_cols);
     
-
     Mat big_matrix_combined1_photo = big_matrix_combined.clone();
+
     save_matrix_with_zeros(big_matrix_combined1_photo, "../data/deprojected_points0.txt", num_rows, num_cols, o_camera_position);
-    cv::imwrite("../data/deprojected_image0.png", big_matrix_combined1_photo);
-    
+    Mat output;
+    normalizeAndInvert(big_matrix_combined1_photo, output);
+    imwrite("../data/deprojected_image0.png", output);
     
     char deprojected_filename[100];
     if(n_images != 1){
@@ -136,9 +137,9 @@ int main(int argc, char *argv[]) {
             Mat big_matrix_combined2_photo = matrix_to_be_merged.clone();
             sprintf(deprojected_filename, "../data/deprojected_points%d.txt", n_image);
             save_matrix_with_zeros(big_matrix_combined2_photo, deprojected_filename, num_rows, num_cols, camera_position);
-
+            normalizeAndInvert(big_matrix_combined2_photo, output);
             sprintf(deprojected_filename, "../data/deprojected_image%d.png", n_image);
-            cv::imwrite(deprojected_filename, big_matrix_combined2_photo);
+            imwrite(deprojected_filename, output);
             
 
             if(check_matrix(big_matrix_combined, matrix_to_be_merged, num_rows, num_cols, e)){
@@ -155,7 +156,8 @@ int main(int argc, char *argv[]) {
     }
 
     save_matrix_with_zeros(big_matrix_combined, "../data/combinated_deprojected_points.txt", num_rows, num_cols, o_camera_position);
-    imwrite("../data/combinated_deprojected_image.png", big_matrix_combined);
+    normalizeAndInvert(big_matrix_combined, output);
+    imwrite("../data/combinated_deprojected_image.png", output);
 
     system("python ../hystogram.py");
     return 0;

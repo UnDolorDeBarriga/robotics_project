@@ -48,8 +48,8 @@ Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_
 
 Vector3f populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int center_point_row, int center_point_col, int cell_dim, int n_rows, int n_cols);
 bool check_matrix(const Mat& matrix1, const Mat& matrix2, int n_rows, int n_cols, int e);
-void save_matrix_with_zeros(Mat& mat, const std::string& filename, int n_rows, int n_cols, Vector3f camera_position);
-
+void save_matrix_with_zeros(const Mat& mat, const std::string& filename, int n_rows, int n_cols, Vector3f camera_position);
+void normalizeAndInvert(const Mat& input, Mat& output);
 #endif // RESOURCES_H
 
 
