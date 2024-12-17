@@ -11,7 +11,7 @@ file_path = os.path.join(execution_path, 'data', f'combinated_deprojected_points
 output_path = os.path.join(execution_path, 'data', f'histogram.png')
 
 
-matrix = np.loadtxt(file_path, delimiter=',', skiprows=0)
+matrix = np.loadtxt(file_path, delimiter=',', skiprows=1)
 # # Flatten the matrix to get the values
 values = matrix.flatten()
 

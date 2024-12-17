@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     if(n_images != 1){
         for(int n_image = 1; n_image < n_images; n_image++){
             Mat matrix_to_be_merged = Mat::zeros(num_rows, num_cols, CV_32SC1);
-            Vector3f camera_position = camera_position = populate_matrix_from_file(filenames[n_image].c_str(), matrix_to_be_merged, center_y, center_x, cell_dim, num_rows, num_cols);
+            Vector3f camera_position = populate_matrix_from_file(filenames[n_image].c_str(), matrix_to_be_merged, center_y, center_x, cell_dim, num_rows, num_cols);
             Mat big_matrix_combined2_photo = matrix_to_be_merged.clone();
             sprintf(deprojected_filename, "../data/deprojected_points%d.txt", n_image);
             save_matrix_with_zeros(big_matrix_combined2_photo, deprojected_filename, num_rows, num_cols, camera_position);
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     normalizeAndInvert(big_matrix_combined, output);
     imwrite("../data/combinated_deprojected_image.png", output);
     
-    system("source ~/Desktop/robotics_project/.venv/bin/activate");
+    // system("source ~/Desktop/robotics_project/.venv/bin/activate");
     system("python ../hystogram.py");
     return 0;
 }
