@@ -80,6 +80,30 @@ int main(int argc, char *argv[]) {
             
             cout << "Image " << image_n << " updated. Altike Mi rey." << endl;
         }
+        else{
+            ifstream myin(o_filename);
+            string line;
+            int line_count = 0;
+            while (getline(myin, line)) {
+                line_count++;
+                if (line_count <= 2) continue; // Ignore the first 2 lines
+                stringstream ss(line);  
+                string temp;
+                getline(ss, temp, ',');
+                double x = stod(temp); 
+                getline(ss, temp, ',');
+                double y = stod(temp);
+                getline(ss, temp, ',');
+                double z = stod(temp);
+                if(std::abs(x) > maxAbsX){
+                    maxAbsX = std::abs(x);
+                }
+                if(std::abs(y) > maxAbsY){
+                    maxAbsY = std::abs(y);
+                }
+            }
+            myin.close();
+        }
     }
     // Stop the pipeline
     pipeline.stop();
