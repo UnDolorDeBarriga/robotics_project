@@ -18,26 +18,26 @@
  */
 rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumulated_depth, Mat &valid_pixel_count, int min_dist, int max_dist) {
     rs2_intrinsics intrinsics;
-    int max_dist_mm = max_dist * 1000;
     for (int frame_count = 0; frame_count < n_index; ++frame_count) {
         // Wait for the next set of frames
         frameset frames = pipeline.wait_for_frames();
         depth_frame depth_frame = frames.get_depth_frame();
         intrinsics = depth_frame.get_profile().as<video_stream_profile>().get_intrinsics();
 
+        float depth;
         Mat depth_data = Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
         // Normalize depth values to max distance (in millimeters)
         for (int i = 0; i < WIDTH; i++){
             for (int j = 0; j < HEIGHT; j++){
-                float depth = depth_frame.get_distance(i, j);
-                if (depth >= min_dist) {
-                    if (depth >= max_dist) {
-                        depth_data.at<float>(j, i) = max_dist_mm;
+                depth = depth_frame.get_distance(i, j)*1000;
+                if (depth >= (float)min_dist) {
+                    if (depth >= (float)max_dist) {
+                        depth_data.at<float>(j, i) = max_dist;
                     }
                     else {
-                        depth_data.at<float>(j, i) = depth * 1000;  // Convert depth to millimeters
+                        depth_data.at<float>(j, i) = depth;
                     }
-                    valid_pixel_count.at<int>(j, i) += 1;
+                    valid_pixel_count.at<float>(j, i) += 1;
                 }
                 else {
                     depth_data.at<float>(j, i) = 0;  // Set out-of-range depth to 0
@@ -59,16 +59,16 @@ rs2_intrinsics get_main_frames_count(pipeline pipeline, int n_index, Mat &accumu
  * @param depth_matrix The depth matrix data.
  * @param intrinsics The camera intrinsics.
  * @param image_n The image number.
- * @param min_dist The minimum distance for depth values (in meters).
- * @param max_dist The maximum distance for depth values (in meters).
+ * @param min_dist The minimum distance for depth values (in milimiters).
+ * @param max_dist The maximum distance for depth values (in milimiters).
  * @return std::vector<Eigen::Vector3f> The 3D points.
  */
-vector<Vector3f> deproject_depth_to_3d(const char i_filename[], Mat depth_matrix, rs2_intrinsics intrinsics, int image_n, int min_dist, int max_dist) {
+vector<Vector3f> deproject_depth_to_3d(const char i_filename[], const Mat &depth_matrix, rs2_intrinsics intrinsics, int image_n, int min_dist, int max_dist) {
     vector<Eigen::Vector3f> points;
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
             float depth = depth_matrix.at<float>(y, x);
-            if (depth > (min_dist*1000) && depth < (max_dist*1000)) {
+            if (depth > (float)min_dist && depth < (float)max_dist) {
                 float point[3];
                 float pixel[2] = { static_cast<float>(x), static_cast<float>(y) };
                 rs2_deproject_pixel_to_point(point, &intrinsics, pixel, depth);
@@ -114,44 +114,25 @@ void write_data_to_files(int n_index, int image_n, const char i_filename[], cons
 
     // Compute the mean depth image
     Mat average_depth = get_mean_depth(accumulated_depth, valid_pixel_count, max_dist);
-    #if DEBUG
-    printf("Computed mean depth for image %d\n", image_n);
-    #endif
 
     // Write the depth data to a CSV file
     write_depth_to_csv(average_depth, n_index, image_n);
-    #if DEBUG
-    printf("Wrote depth data to CSV for image %d\n", image_n);
-    #endif
 
     // Deproject the mean depth image into 3D points
     auto points_image = deproject_depth_to_3d(i_filename, average_depth, intrinsics, image_n, min_dist, max_dist);
-    #if DEBUG
-    printf("Deprojected depth to 3D for image %d\n", image_n);
-    #endif
 
     // Write the mean depth image to a PNG file
-    write_depth_to_image(average_depth, (max_dist*1000), n_index, image_n);
-    #if DEBUG
-    printf("Wrote depth image to PNG for image %d\n", image_n);
-    #endif
+    write_depth_to_image(average_depth, max_dist, n_index, image_n);
     // Get the user points for the camera position and angle
     //get_user_points_input(image_n, camera_position, camera_angle);
     Vector3f camera_position, camera_angle = Vector3f::Zero();
     get_user_points_file(pos_filename, image_n, camera_position, camera_angle);
-    #if DEBUG
     cout << "Camera Position: " << camera_position.transpose() << endl;
     cout << "Camera Angle: " << camera_angle.transpose() << endl;
-    #endif
+
 
     Matrix4d M = create_transformation_matrix(camera_position, camera_angle);
-    #if DEBUG
-    printf("Created transformation matrix for image %d\n", image_n);
-    #endif
     transformate_cordinates(i_filename, o_filename, M, maxAbsX, maxAbsY, camera_position, camera_angle);
-    #if DEBUG
-    printf("Transformed coordinates for image %d\n", image_n);
-    #endif
     return;
 }
 
@@ -170,12 +151,12 @@ Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count, int max_dist) {
     float average_depth_point = 0.0f;
     for (int x = 0; x < accumulated_depth.cols; ++x) {
         for (int y = 0; y < accumulated_depth.rows; ++y) {
-            if (valid_pixel_count.at<int>(y, x) > 0) {
-                average_depth_point = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
-                if (average_depth_point >= 0.99*(max_dist*1000)){
-                    average_depth.at<float>(y, x) = max_dist*1000; 
+            if (valid_pixel_count.at<float>(y, x) > 0) {
+                average_depth_point = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<float>(y, x);
+                if (average_depth_point >= 0.99*max_dist){
+                    average_depth.at<float>(y, x) = max_dist; 
                 } else {
-                    average_depth.at<float>(y, x) = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<int>(y, x);
+                    average_depth.at<float>(y, x) = accumulated_depth.at<float>(y, x) / valid_pixel_count.at<float>(y, x);
                 }
             }
         }
@@ -190,7 +171,7 @@ Mat get_mean_depth(Mat accumulated_depth, Mat valid_pixel_count, int max_dist) {
  * @param n_index The index of the current image.
  * @param image_n The image number.
  */
-void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n) {
+void write_depth_to_csv(const Mat &depth_matrix, int n_index, int image_n) {
     char filename[50];
     sprintf(filename, "../data/mean%d_depth%d.csv", n_index, image_n);
     ofstream csv_file(filename);
@@ -200,7 +181,7 @@ void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n) {
     }
     for (int y = 0; y < HEIGHT; ++y) {
         for (int x = 0; x < WIDTH; ++x) {
-            float depth_mm = depth_matrix.at<float>(y, x);
+            int depth_mm = depth_matrix.at<float>(y, x);
             csv_file << depth_mm << ",";
         }
         csv_file << "\n";
@@ -217,7 +198,7 @@ void write_depth_to_csv(Mat depth_matrix, int n_index, int image_n) {
  * @param n_index The index of the current depth image.
  * @param image_n The image number.
  */
-void write_depth_to_image(Mat depth_matrix, int max_depth, int n_index, int image_n) {
+void write_depth_to_image(const Mat &depth_matrix, int max_depth, int n_index, int image_n) {
     Mat mean_depth_image;
     depth_matrix.convertTo(mean_depth_image, CV_8UC1, 255.0 / (max_depth), -255.0 / (max_depth));
     Mat depth_color;
@@ -407,7 +388,7 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
     while (getline(myin, line)) {
         stringstream ss(line);  
         string temp;
-        Vector4d vec;
+        Vector4d vec, vec_t;
         vec(3)=1;
         getline(ss, temp, ',');
         vec(0) = stod(temp); 
@@ -415,14 +396,14 @@ void transformate_cordinates(const char i_filename[],const char o_filename[], Ma
         vec(1) = stod(temp);
         getline(ss, temp, ',');
         vec(2) = stod(temp);
-        vec=M*vec;
-        if (vec(1) >= 0){
-            myout << vec(0) << "," << vec(1) << "," << vec(2) << endl;
-            if(std::abs(vec(0))>maxAbsX){
-                maxAbsX = std::abs(vec(0));
+        vec_t = M * vec;
+        if (vec_t(1) >= 0 && vec(1) <= camera_position(2)){
+            myout << vec_t(0) << "," << vec_t(1) << "," << vec_t(2) << endl;
+            if(std::abs(vec_t(0))>maxAbsX){
+                maxAbsX = std::abs(vec_t(0));
             }
-            if(std::abs(vec(1)) > maxAbsY){
-                maxAbsY = std::abs(vec(1));
+            if(std::abs(vec_t(1)) > maxAbsY){
+                maxAbsY = std::abs(vec_t(1));
             }
         }
     }
@@ -448,7 +429,7 @@ Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_
     Matrix4d Rz = rotation_matrix(3, camera_angle[2]);
 
     Matrix4d T= translation_matrix(camera_position[0], camera_position[1], camera_position[2]);
-    Matrix4d M = Rotatey_z * Rz * Ry *Rx * T;
+    Matrix4d M = T * Rz * Ry * Rx * Rotatey_z;
     return M;
 }
 
@@ -472,23 +453,30 @@ Matrix4d create_transformation_matrix(Vector3f camera_position, Vector3f camera_
  * If the z value at a position is greater than the current value or the current value is 0,
  * the matrix is updated with the new z value.
  */
-void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int center_point_row, int center_point_col, int cell_dim, int n_rows, int n_cols) { 
+Vector3f populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int center_point_row, int center_point_col, int cell_dim, int n_rows, int n_cols) { 
+    Vector3f camera_position = Vector3f::Zero();
     ifstream file(i_filename);
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
-        return;
+        return camera_position;
     }
     int row, col;
     int z_value;
-
     string line;
     // Ignore the first two lines
     getline(file, line);
+    stringstream ss_position(line);
+    ss_position >> camera_position(0);
+    ss_position.ignore(1);
+    ss_position >> camera_position(1);
+    ss_position.ignore(1);
+    ss_position >> camera_position(2);
+
     getline(file, line);
     int err = 0;
+    double x, y, z;
     while (getline(file, line)) {
         istringstream iss(line);
-        double x, y, z;
         char comma1, comma2;
         if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
             cerr << "Invalid line format: " << line << endl;
@@ -498,10 +486,10 @@ void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int cen
         row = center_point_row - static_cast<int>(floor(y / cell_dim));
 
         if (row >= 0 && row <= n_rows && col >= 0 && col <= n_cols) {
-            z_value = static_cast<int>(round(z));
-            if(matrix.at<uchar>(row, col) < z_value || matrix.at<uchar>(row, col) == 0){
-                if(z_value >= ERROR){
-                    matrix.at<uchar>(row, col) = z_value;
+            z_value = z;
+            if(matrix.at<int>(row, col) < z_value || matrix.at<int>(row, col) == 0){
+                if(abs(z_value) > MAX_ERROR){
+                    matrix.at<int>(row, col) = z_value;
                 }
             }
         } else {
@@ -509,7 +497,7 @@ void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int cen
         }
     }
     file.close();
-    return;
+    return camera_position;
 }
 
 /**
@@ -523,35 +511,30 @@ void populate_matrix_from_file(const char i_filename[], cv::Mat& matrix, int cen
  * @param filename The name of the file to save the matrix to.
  * @param n_rows The number of rows in the matrix.
  * @param n_cols The number of columns in the matrix.
- * @return The maximum value found in the matrix.
  */
-int save_matrix_with_zeros(Mat& mat, const std::string& filename, int n_rows, int n_cols) {
+void save_matrix_with_zeros(Mat& mat, const std::string& filename, int n_rows, int n_cols, Vector3f camera_position) {
     std::ofstream file(filename);
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
-        return 0;
+        return;
     }
-    double value;
-    int max = 0;
+    int value;
+    // file << camera_position(0) << "," << camera_position(1) << "," << camera_position(2) << endl;
     for (int i = 0; i < n_rows; ++i) {
         for (int j = 0; j < n_cols; ++j) {
-            value = mat.at<uchar>(i, j);
-            if(max < value){
-                max = value;
-            }
+            value = mat.at<int>(i, j);
             file << value;
             if (j < n_cols - 1) {
                 file << ", ";
             }
             if(value == 0){
-                mat.at<uchar>(i, j) = 255;
+                mat.at<int>(i, j) = 255;
             }
-
         }
         file << "\n";
     }
     file.close();
-    return max;
+    return;
 }
 
 
@@ -566,13 +549,13 @@ int save_matrix_with_zeros(Mat& mat, const std::string& filename, int n_rows, in
  * @param e The threshold value for comparison.
  * @return true if the average root of the squared differences is less than the threshold, false otherwise.
  */
-bool check_matrix(Mat& matrix1, Mat& matrix2, int n_rows, int n_cols, int e) {
+bool check_matrix(const Mat& matrix1, const Mat& matrix2, int n_rows, int n_cols, int e) {
     int n = 0, temp_val1 = 0, temp_val2 = 0;
     int squared_sum = 0;
     for (int i = 0; i < n_rows; i++) {
         for (int j = 0; j < n_cols; j++) {
-            temp_val1 = matrix1.at<uchar>(i, j);
-            temp_val2 = matrix2.at<uchar>(i, j);
+            temp_val1 = matrix1.at<int>(i, j);
+            temp_val2 = matrix2.at<int>(i, j);
             if(temp_val1 != 0 && temp_val2 != 0) {
                 n += 1;
                 squared_sum += std::abs(std::pow(temp_val1,2) - std::pow(temp_val2,2));

@@ -6,3 +6,5 @@ depth_image/build/*
 
 matrix/build/*
 !matrix/build/.gitkeep
+
+.venv
