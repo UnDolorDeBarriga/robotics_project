@@ -48,5 +48,6 @@ Where:
 
 [Arnau Bayer Mena](https://github.com/UnDolorDeBarriga)
 [Giacomo Montagna](https://github.com/Giaco02)
+[Jacopo Isetti](https://github.com/jacopoise51)
 
 
